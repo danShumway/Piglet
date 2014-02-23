@@ -16,30 +16,60 @@ pastInputs.firstIndex = 1
 pastInputs.count = 0
 differencesToTrack = {}
 differencesToTrack.count = 0
+
+--We also have a small amount of state management (are we experimenting or not?)
+experimenting = false --are we experimenting?
+experimenting_count = 0 -- how long have we been experimenting?
+experimenting_reset = 20 -- how many inputs do we take when we experiment?
+
 --What does a frame look like and how do we make one?
 function addInput(justPressed, currentNovelty)
-	local index = table.getn(pastInputs) + 1
+	local index = pastInputs.firstIndex + pastInputs.count --table.getn(pastInputs) + 1
 	pastInputs[index] = justPressed
 	pastInputs[index].novely = currentNovelty
+	pastInputs.count = pastInputs.count + 1
+
+	--And get rid of the old inputs.
+	if(pastInputs.count > 1000) then
+
+		pastInputs[pastInputs.firstIndex] = nil
+		pastInputs.firstIndex = pastInputs.firstIndex + 1
+		pastInputs.count = pastInputs.count - 1
+	end
+
+
 end
 --Saving the past so we can go back to it when necessary.
 function makeSaveState()
-	local num = table.getn(saveStates) + 1
+	local num = saveStates.count + saveStates.firstIndex
 	if(vba.framecount() % framesPerSaveState == 0) then
+		--Add the savestate.
 		saveStates[num] = savestate.create()
+		saveStates.count = saveStates.count + 1
 		--And save.
 		savestate.save(saveStates[num])
+
+		--Also, remove old savestates if necessary.
+		if(saveStates.count > 25) then
+			saveStates[saveStates.firstIndex] = nil
+			saveStates.firstIndex = saveStates.firstIndex + 1
+			saveStates.count = saveStates.count - 1
+		end
 	end
 end
 --And adding a way to go back to that past.
 function loadSaveState()
 	local num = table.getn(saveStates)
 	savestate.load(saveStates[num - 1])
+	--Jump back two savestates, I guess.
 	saveStates[num] = nil
 	saveStates[num - 1] = nil
-	local num2 = table.getn(pastInputs)
+	saveStates.count = saveStates.count - 2
+
+	local num2 = pastInputs.count + pastInputs.firstIndex
 	for i=num2 - framesPerSaveState, num2 do
 		pastInputs[i] = nil
+		pastInputs.count = pastInputs.count - 1
 	end
 end
 
@@ -58,13 +88,13 @@ currentExcitement = 0
 totalExcitement = .5 --Influenced by the newer novelty system, this tells it when it needs to get really creative.
 
 --Anticipation (get it to try things for longer than one frame)
-frameTry = 2
+frameTry = 3
 currentTry = {} --What input are you trying right now?
 reflectionCount = 30 --How often do you check if you're feeling bored.
 
 
 --Baselines for tolerance and bias - what does he find boring?
-tolerance = 45
+tolerance = 40
 timeBored = 0 --A sense of self awareness?  Is something significant enough to check for?
 baseActivity = 0 --What normally goes on in the world?
 
@@ -188,115 +218,148 @@ function chooseInput()
 		return {}
 	end
 
-	bestFrame = {0}
-	bestInput = {0}
+	bestFrame = {0, 0, 0, 0, 0, 0, 0, 0}
+	bestInput = {0, 0, 0, 0, 0, 0, 0, 0}
 
 	--Are you in the middle of trying something?
 	if(vba.framecount() % frameTry == 0) then
+
+
+
 	--Otherwise it's time to pick some new input.
-		for i=table.getn(pastInputs), table.getn(pastInputs) - shortTermMemory, -1 do
-			if(pastInputs[i] ~= nil) then
 
-				--Loop through and see if you need to be added to the list of good inputs.
-				local added=false
-				for j=1, table.getn(bestInput) do
-					if(pastInputs[i].novely > bestInput[j] and added == false) then
-						bestInput[j] = pastInputs[i].novely
-						bestFrame[j] = pastInputs[i]
-						added = true
+	--First off, are we trying something new or are we learning from the old?
+		if(experimenting == false) then
+			local start = pastInputs.firstIndex
+			local endIndex = pastInputs.count + pastInputs.firstIndex
+			for i=endIndex, endIndex - shortTermMemory, -1 do
+				if(pastInputs[i] ~= nil) then
+
+					--Loop through and see if you need to be added to the list of good inputs.
+					local added=false
+					for j=1, table.getn(bestInput) do
+						if(pastInputs[i].novely > bestInput[j] and added == false) then
+							bestInput[j] = pastInputs[i].novely
+							bestFrame[j] = pastInputs[i]
+							added = true
+						end
 					end
+
 				end
-
-			end
-		end
-
-
-		local aCount, bCount, upCount, downCount, leftCount, rightCount, averageNovelty = 0, 0, 0, 0, 0, 0, 0
-		local keys = {}
-		local length = table.getn(bestInput)
-		for j=1, length do
-			--Average them together and get the most pressed keys.
-			if(bestFrame[j].A == 1) then aCount = aCount + 1 end
-			if(bestFrame[j].B == 1) then bCount = bCount + 1 end
-			if(bestFrame[j].left == 1) then leftCount = leftCount + 1 end
-			if(bestFrame[j].right == 1) then rightCount = rightCount + 1 end
-			if(bestFrame[j].up == 1) then upCount = upCount + 1 end
-			if(bestFrame[j].down == 1) then downCount = downCount + 1 end
-
-			averageNovelty = averageNovelty + bestFrame[j].novely
-		end
-		--Build based on the input.  You need a 2/3 vote to get into the repeat.
-		--[[if(aCount >= 1) then keys.A = 1 end
-		if(bCount >= 1) then keys.B = 1 end
-		if(leftCount >= 1) then keys.left = 1 end
-		if(rightCount >= 1) then keys.right = 1 end
-		if(upCount >= 1) then keys.up = 1 end
-		if(downCount >= 1) then keys.down = 1 end]]
-		averageNovelty = averageNovelty/table.getn(bestInput)
-		keys = bestFrame[1]
-
-
-		--If the best frame was interesting enough, repeat that action.
-		if(averageNovelty > tolerance) then
-			--Oh, we found something interesting.
-			timeBored = 0
-			joypad.set(1, keys)
-			vba.print("using memory")
-			currentTry = keys --Set what you're currently doing.
-			return keys
-		--Otherwise, mess around with random input.  This could be done better.
-		else
-			keys = {}
-
-			timeBored = timeBored + 1 --Also, I'm bored.
-			local rand = 0
-
-			rand = math.random()
-			if (rand < .45) then
-				keys.A = 1
 			end
 
-			rand = math.random()
-			if (rand < .45) then
-				keys.B = 1
+
+			local aCount, bCount, upCount, downCount, leftCount, rightCount, averageNovelty = 0, 0, 0, 0, 0, 0, 0
+			local keys = {}
+			local length = table.getn(bestInput)
+			for j=1, length do
+				--Average them together and get the most pressed keys.
+				if(bestFrame[j].A == 1 and bestFrame[j].novely > tolerance) then aCount = aCount + 1 end
+				if(bestFrame[j].B == 1 and bestFrame[j].novely > tolerance) then bCount = bCount + 1 end
+				if(bestFrame[j].left == 1 and bestFrame[j].novely > tolerance) then leftCount = leftCount + 1 end
+				if(bestFrame[j].right == 1 and bestFrame[j].novely > tolerance) then rightCount = rightCount + 1 end
+				if(bestFrame[j].up == 1 and bestFrame[j].novely > tolerance) then upCount = upCount + 1 end
+				if(bestFrame[j].down == 1 and bestFrame[j].novely > tolerance) then downCount = downCount + 1 end
+
+				if(bestFrame[j].novely > averageNovelty) then
+					averageNovelty = bestFrame[j].novely
+					--averageNovelty = averageNovelty + (bestFrame[j].novely/length)
+					vba.print(averageNovelty)
+				end
 			end
 
-			rand = math.random()
-			if (rand < .333) then
+
+
+			--Build based on the input.
+			keys = bestFrame[1] -- Allows keys to compete with each other.
+			--if(aCount >= 1) then keys.A = 1 end
+			--if(bCount >= 1) then keys.B = 1 end
+			if(leftCount > rightCount) then
 				keys.left = 1
-			elseif(rand < .666) then
+				keys.right = nil
+			elseif(leftCount < rightCount) then
 				keys.right = 1
-			end --or press neither
-
-			rand = math.random()
-			if (rand< .333) then
-				keys.up = 1
-			elseif(rand < .666) then
-				keys.down = 1
-			end
-
-			--Line that up with what the user is holding.  If the user is holding a key, it can't be pressed.
-			userKeys = input.get()
-			if(userKeys.Z == true) then
-				keys.A = nil
-				vba.print("suppressing A")
-			end
-			if(userKeys.X == true) then keys.B = nil end
-			if(userKeys.left == true) then
+				keys.left = nil
+			else
+				keys.right = nil
 				keys.left = nil
 			end
-			if(userKeys.right == true) then keys.right = nil end
-			if(userKeys.up == true) then keys.up = nil end
-			if(userKeys.down == true) then keys.down = nil end
+			if(upCount > downCount) then
+				keys.up = 1
+				keys.down = nil
+			elseif (upCount < downCount) then
+				keys.down = 1
+				keys.up = nil
+			else
+				keys.down = nil
+				keys.up = nil
+			end
+			--averageNovelty = averageNovelty/table.getn(bestInput)
 
-			joypad.set(1, keys)
-			vba.print("trying something brand new!")
-			currentTry = keys
-			return keys
 
+			--If the best frame was interesting enough, repeat that action.
+			if(averageNovelty > tolerance) then
+				--Oh, we found something interesting.
+				timeBored = 0
+				joypad.set(1, keys)
+				--vba.print("using memory")
+				currentTry = keys --Set what you're currently doing.
+				return keys
+			--Otherwise, mess around with random input.  This could be done better.
+			else
+				keys = {}
+
+				timeBored = timeBored + 1 --Also, I'm bored.
+				local rand = 0
+
+				rand = math.random()
+				if (rand < .45) then
+					keys.A = 1
+				end
+
+				rand = math.random()
+				if (rand < .45) then
+					keys.B = 1
+				end
+
+				rand = math.random()
+				if (rand < .4) then
+					keys.left = 1
+				elseif(rand < .8) then
+					keys.right = 1
+				end --or press neither
+
+				rand = math.random()
+				if (rand< .4) then
+					keys.up = 1
+				elseif(rand < .8) then
+					keys.down = 1
+				end
+
+				--Line that up with what the user is holding.  If the user is holding a key, it can't be pressed.
+				userKeys = input.get()
+				if(userKeys.Z == true) then
+					keys.A = nil
+					--vba.print("suppressing A")
+				end
+				if(userKeys.X == true) then keys.B = nil end
+				if(userKeys.left == true) then
+					keys.left = nil
+				end
+				if(userKeys.right == true) then keys.right = nil end
+				if(userKeys.up == true) then keys.up = nil end
+				if(userKeys.down == true) then keys.down = nil end
+
+				joypad.set(1, keys)
+				--vba.print("trying something brand new!")
+				currentTry = keys
+				return keys
+
+			end
 		end
 
 	else
+
 		joypad.set(1, currentTry)
 		return currentTry
 	end
@@ -327,7 +390,6 @@ while (true) do
 		getFrustrated()
 	end
 
-
 	--Something something something
 	--Check previous states.
 	if(significantFrames.count > 1) then
@@ -351,8 +413,9 @@ while (true) do
 	end
 
 	--If you've been bored for a while, jump back to a previous state and do some other stuff.
-	if(timeBored > framesPerSaveState*1/2 - 5) then
+	if(timeBored > framesPerSaveState*1/3) then
 		loadSaveState()
+		currentExcitement = 0
 		timeBored = 0
 	end
 
@@ -360,7 +423,6 @@ while (true) do
 
 	--fileWrite()
 	makeSaveState()
-
 
 	vba.frameadvance()
 

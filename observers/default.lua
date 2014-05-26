@@ -25,7 +25,7 @@ function observer.Observe(self)
 
 	self.previousFrame = self.currentFrame --Switch back to make room for currentFrame's new data.
 	self.bytesChanged = 0 --reset bytesChanged.
-	--Hard coded for the visual boy advance.  Future modules might be different.
+	--Hard coded for the visual boy advance.  Future modules might (should) be different.
 	self.currentFrame = memory.readbyterange(0, 256*16*16) --size of the gameboy color memory.
 
 

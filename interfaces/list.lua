@@ -22,7 +22,7 @@ function List.CreateList()
 	--Set variables.
 	--Lists are 1 based because most of Lua is 1 based, not because I like it.
 	toReturn.FirstIndex = 1
-	toReturn.LastIndex = 1
+	toReturn.LastIndex = 0
 	toReturn.Count = 0
 
 	--Used for internal error checking, maybe, sometime.
@@ -62,8 +62,8 @@ function List.Pop(self) --back
 		--If you can remove.
 		if(self.Count ~= 0) then
 			local toReturn = self[self.LastIndex] --Grab value to return.
-			self[self.FirstIndex] = nil
-			self.FirstIndex	= self.LastIndex - 1 --We don't end there anymore.
+			self[self.LastIndex] = nil
+			self.LastIndex	= self.LastIndex - 1 --We don't end there anymore.
 			self.Count = self.Count - 1 --Update count.
 
 			return toReturn; --Send Data.
@@ -78,6 +78,7 @@ function List.Push(self, data) --back
 	if(self.Type == 'List') then
 		self[self.LastIndex + 1] = data
 		self.Count = self.Count + 1
+		self.LastIndex = self.LastIndex + 1
 	end
 end
 
@@ -85,6 +86,7 @@ function List.Budge(self, data) --front
 	if(self.Type == 'List') then
 		self[self.FirstIndex - 1] = data --yes, we can actually have a list where -1 is the starting index.
 		self.Count = self.Count + 1
+		self.FirstIndex = self.FirstIndex - 1
 	end
 end
 
@@ -120,6 +122,44 @@ function List.CheckAll(self, func, context)
 	end
 
 	return nil --We didn't meet whatever condition you wanted to meet.
+end
+
+
+--Returns true if the value was inserted, false otherwise.
+function List.Insert(self, index, value)
+
+	--Check to see if you're inserting in a good position.
+
+	--For blank lists (might be unneccesary)
+	if(self.Count == 0) then 
+		List.Push(self, value) 
+		return true
+	end
+
+	--in the back
+	if(index > self.LastIndex) then
+		List.Push(self, value)
+		return true
+	end
+
+	--in the front
+	if(index < self.FirstIndex) then
+		List.Budge(self, value)
+		vba.print('budging')
+		return true
+	end
+
+	--Ideally, this would check to see whether it should shift values forward
+		--or backwards and do it in the more efficient way.  It doesn't yet.
+
+	--Loop through until you reach the inserted index and shift values back.
+	for a=self.LastIndex, index, -1 do
+		self[a+1] = self[a]
+	end
+	--Add the inserted value
+	self[index] = value
+	self.Count = self.Count + 1
+	self.LastIndex = self.LastIndex + 1
 end
 
 

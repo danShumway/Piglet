@@ -7,7 +7,6 @@
 --Make our observer object.
 observer = {}
 
-
 --++++++++++++++++++++PUBLIC+++++++++++++++++++++++++++++++
 
 ---VARIABLES
@@ -48,5 +47,10 @@ end
 
 
 --+++++++++++++++++++PRIVATE++++++++++++++++++++++++++++++++
+--By name only.
 
 --+++++++++++++++++++e/PRIVATE++++++++++++++++++++++++++++++
+
+
+--End of the file.
+return observer

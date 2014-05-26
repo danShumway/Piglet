@@ -89,30 +89,30 @@ function List.Budge(self, data) --front
 end
 
 --An iterator that takes a function as a parameter.
-function List.ForEach(self, function, context)
-	for local a=self.FirstIndex, self.LastIndex do
+function List.ForEach(self, func, context)
+	for a=self.FirstIndex, self.LastIndex do
 		if(context ~= nil) then
-			function(context, a) --When you're using an object.
+			func(context, a) --When you're using an object.
 		else
-			function(a) --For global context
+			func(a) --For global context
 		end
 	end
 end
 
 --Runs an interator until something other than nil is returned, then returns that value.
-function List.CheckAll(self, function, context)
+function List.CheckAll(self, func, context)
 
 	local toReturn;
-	for local a=self.FirstIndex, self.LastIndex do
+	for a=self.FirstIndex, self.LastIndex do
 		if(context ~= nil) then
 			--When you're using an object.
-			toReturn = function(context, a)
+			toReturn = func(context, a)
 			if(toReturn ~= nil) then
 				return toReturn
 			end
 		else
 			--When you're using an object.
-			toReturn = function(a)
+			toReturn = func(a)
 			if(toReturn ~= nil) then
 				return toReturn
 			end
@@ -126,3 +126,5 @@ end
 --I'll add some more stuff later, as needed.
 
 --+++++++++++++++++++e/PUBLIC+++++++++++++++++++++++++++++++
+
+

@@ -5,33 +5,39 @@
 --
 
 --make our decider object
-decider = {}
+local decider = {}
 
 --++++++++++++++++++++PUBLIC+++++++++++++++++++++++++++++++
 
 ---VARIABLES
-decider.Memory = false;
 decider.Experimenting = false; --Are we trying something new or utilizing the past?
+decider.framesToTry = 0;
+
 
 ---FUNCTIONS
 
---decides what input to press for the current frame.
-function decider.ChooseInput(self)
+--decides what input to press for the current frame, and returns it as an object.
+--Requires a list of past inputs (using the List class), and some other stuff probably.
+function decider.ChooseInput(self, pastInputs)
 
-	--If you have any RAM to work with.
-	if(self.Memory ~= false) then
+	--If I'm in the middle of trying something.
+	if(self.framesToTry > 0) then return {} end
+
+	--If you have any information to work with
+	if(pastInputs ~= nil and pastInputs.Count ~= 0) then
 		--Are we trying something new?
 		if(self.Experimenting == false) then
-			local start = self.Memory.PastInputs.firstIndex; --Needs some fleshing out.
+			local start = pastInputs.FirstIndex; --Needs some fleshing out.
 			--TODO: Finish this.  And the rest of the method.
+			return {}
 		end
 	end
+
+	return {} --How did you get here?
 end
 
---This isn't exactly modular, but I want a method so that I can basically check to see what info I have.
---Not being used at the moment, so it will be hard to see the use until I start expanding things later.
-function decider.GiveInfo(self, memory)
-
-end
 
 --++++++++++++++++++++e/PUBLIC+++++++++++++++++++++++++++++
+
+
+return decider --Return the object so that index can actually use it.

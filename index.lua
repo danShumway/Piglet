@@ -1,31 +1,26 @@
+--
+--Copyright Daniel Shumway, 2014
+--Licensed under GNU affero general public license
+--http://www.gnu.org/licenses/agpl-3.0.html
+--
+
 dofile('interfaces/List.lua')
 
 --Load in the modules
 myDecider = dofile('deciders/default.lua')
-pastInputs = List.CreateList()
-List.Push(pastInputs, {})
-List.Push(pastInputs, {})
-List.Push(pastInputs, {})
-List.Push(pastInputs, {})
-List.Push(pastInputs, {})
-List.Push(pastInputs, {})
-List.Push(pastInputs, {})
-List.Push(pastInputs, {})
-List.Push(pastInputs, {})
-List.Push(pastInputs, {})
+myObserver = dofile('observers/default.lua')
+myMemory = dofile('memory/default.lua')
 
 
-pastResults = List.CreateList()
-List.Push(pastResults, 10)
-List.Push(pastResults, 4)
-List.Push(pastResults, 3)
-List.Push(pastResults, 2)
-List.Push(pastResults, 5)
-List.Push(pastResults, 6)
-List.Push(pastResults, 7)
-List.Push(pastResults, 8)
-List.Push(pastResults, 9)
-List.Push(pastResults, 1)
+keys = {}
+joypad.set(1, keys)
+while(true) do
 
+	myObserver.Observe(myObserver)
+	myMemory.Store(myMemory, myDecider.currentKeysPressed, myObserver.currentFrame, myObserver.bytesChanged)
+	keys = myDecider.ChooseInput(myDecider, myMemory.pastInputs, myMemory.pastResults, 200, 40, 220)
+	print(keys)
+	joypad.set(1, keys)
+	vba.frameadvance()
 
-myDecider.ChooseInput(myDecider, pastInputs, pastResults, 10, 5)
+end

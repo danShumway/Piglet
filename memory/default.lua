@@ -5,7 +5,23 @@
 --
 
 --make our memory object
-memory = {}
+local memory = {}
 
 --++++++++++++++++++++PUBLIC+++++++++++++++++++++++++++++++
 
+memory.pastInputs = List.CreateList()
+memory.pastFrames = List.CreateList()
+memory.pastResults = List.CreateList()
+
+---FUNCTIONS
+
+function memory.Store(self, input, frameData, result)
+	List.Push(self.pastInputs, input)
+	--List.Push(self.pastFrames, frameData)
+	List.Push(self.pastResults, result)
+end
+
+
+--++++++++++++++++++e/PUBLIC+++++++++++++++++++++++++++++++
+
+return memory

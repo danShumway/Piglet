@@ -5,7 +5,7 @@
 --
 
 --Make our observer object.
-observer = {}
+local observer = {}
 
 --++++++++++++++++++++PUBLIC+++++++++++++++++++++++++++++++
 
@@ -31,10 +31,10 @@ function observer.Observe(self)
 
 	--Loop through previous frame and count differences, if you can.
 	if(self.previousFrame ~= false) then
-		for local a=0, 256*16*16 do
+		for a=0, 256*16*16 do
 			--If you have data that's different.
 			if(self.previousFrame[a] ~= self.currentFrame[a]) then
-				self.bytesChanged = self.bytesChanged = 1
+				self.bytesChanged = self.bytesChanged + 1
 			end
 		end
 	end

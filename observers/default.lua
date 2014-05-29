@@ -12,13 +12,14 @@ local observer = {}
 ---VARIABLES
 
 --Number of bytes changed since the last frame.
-observer.bytesChanged = 0;
+observer.bytesChanged = 0
 --Observed content from the previous frame.
-observer.previousFrame = false; --Default to false, will become an array soon.
+observer.previousFrame = false --Default to false, will become an array soon.
 --Observed content from the current frame.
-observer.currentFrame = false; --Default to false, will become an array soon.
+observer.currentFrame = false --Default to false, will become an array soon.
 
 ----FUNCTIONS
+
 
 --Checks for changes and updates all the current variables.
 function observer.Observe(self)	

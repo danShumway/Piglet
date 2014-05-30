@@ -81,8 +81,8 @@ function decider.ChooseInput(self, pastInputs, pastResults, memoryLength, frames
 	--We can't press all directions at the same time, so we let them compete with each other.
 	for j=bestInput.FirstIndex, bestInput.LastIndex do
 		--record average novelty
-		avgNovelty = (avgNovelty * (j - bestFrame.FirstIndex) + bestFrame[j].novelty)/(j - bestFrame.FirstIndex + 1)
-		--if(bestFrame[j].novelty > avgNovelty) then avgNovelty = bestFrame[j].novelty end
+		--avgNovelty = (avgNovelty * (j - bestFrame.FirstIndex) + bestFrame[j].novelty)/(j - bestFrame.FirstIndex + 1)
+		if(bestFrame[j].novelty > avgNovelty) then avgNovelty = bestFrame[j].novelty end
 
 		--A little bit arbitrary, if there are the same number of left and right inputs, just do neither.
 		--Left and right
@@ -132,7 +132,7 @@ function decider.ChooseInput(self, pastInputs, pastResults, memoryLength, frames
 		self.currentKeysPressed = keys
 		return keys
 	else --IF IT's NOT WORTH REPEATING
-		print('startExperimenting')
+		print("bored - "..avgNovelty)
 		self.framesToTry = 30 --SHould not be hard coded in the future
 		self.currentKeysPressed = self.RandomInput(self)
 		return self.currentKeysPressed
@@ -140,6 +140,7 @@ function decider.ChooseInput(self, pastInputs, pastResults, memoryLength, frames
 
 	return {} --How did you get here?
 end
+
 
 --Presses random keys.
 function decider.RandomInput(self)

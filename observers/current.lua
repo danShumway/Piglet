@@ -32,7 +32,7 @@ function observer.Setup(self)
 	for a=0, 256*16*16 do
 		--Bytes to check starts out with a value greater than 0, meaning, how much trust we're putting in it.
 		--If it drops to 0, it changes to nil, meaning we're no longer watching it.
-		bytesToCheck[a] = 100
+		self.bytesToCheck[a] = 100
 	end
 end
 
@@ -40,6 +40,7 @@ end
 --Always call this first.
 function observer.Observe(self)	
 
+	self.changing = {}
 	self.previousFrame = self.currentFrame --Switch back to make room for currentFrame's new data.
 	self.bytesChanged = 0 --reset bytesChanged.
 	--Hard coded for the visual boy advance.  Future modules might (should) be different.
@@ -48,7 +49,7 @@ function observer.Observe(self)
 
 	--Loop through previous frame and count differences, if you can.
 	if(self.previousFrame ~= false) then
-		for k, v in pairs(self.bytesToTrack)
+		for k, v in pairs(self.bytesToCheck) do
 			--If you have data that's different.
 			if(self.previousFrame[k] ~= self.currentFrame[k]) then
 				self.bytesChanged = self.bytesChanged + 1
@@ -56,6 +57,8 @@ function observer.Observe(self)
 			end
 		end
 	end
+
+	vba.message(self.bytesChanged)
 end
 
 --Basically, cull is looking for different types of information
@@ -70,6 +73,7 @@ function observer.removeLoops(self, stage)
 	if(stage == 1) then --Before keypress.
 		--Take a snapshot.
 		self._removeLoops_snapshot = memory.readbyterange(0, 256*16*16)
+
 	elseif(stage == 2) then --During keypress.
 		--Record data that's changing.  Add it to the list of all data that's changing.
 		for k, v in pairs(self.changing) do
@@ -77,17 +81,33 @@ function observer.removeLoops(self, stage)
 		end
 	elseif(stage == 3) then -- After keypress.
 		--Compare to the snapshot and address.
-		for k, v in pairs(self.changing) do
-			if(self._removeLoops_snapshot[k] == self.currentFrame[k]) --If it changed, and then just changed back.
+		local countThing = 0
+		for k, v in pairs(self._removeLoops_changing) do
+			if(self._removeLoops_snapshot[k] == self.currentFrame[k]) then--If it changed, and then just changed back.
 				--Don't track it.
-				self.bytesToTrack[k] = nil
+				if(self.bytesToCheck[k] ~= nil) then countThing = countThing + 1 end
+				self.bytesToCheck[k] = nil
+			end
 		end
+		vba.print("Ignoring "..countThing.." bytes.")
 
 	end
 end
 
-function observer.removeNoise(self, stage)
 
+observer._removeNoise_totalChanged = 0
+function observer.removeNoise(self)
+	--Reaaal simple.
+	--Hey, what's changing?
+	--I mean, I'm not pressing any buttons right now.
+	--So, it can't be that important.
+	--Ignore it.
+	for k, v in pairs(self.changing) do
+		if(self.bytesToCheck[k] ~= nil) then 
+			self._removeNoise_totalChanged = self._removeNoise_totalChanged + 1 
+		end
+		self.bytesToTrack[k] = nil
+	end
 end
 
 --++++++++++++++++++++e/PUBLIC+++++++++++++++++++++++++++++

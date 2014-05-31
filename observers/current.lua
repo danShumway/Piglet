@@ -81,15 +81,21 @@ function observer.removeLoops(self, stage)
 		end
 	elseif(stage == 3) then -- After keypress.
 		--Compare to the snapshot and address.
-		local countThing = 0
+		local countThing, countThing2 = 0, 0
 		for k, v in pairs(self._removeLoops_changing) do
 			if(self._removeLoops_snapshot[k] == self.currentFrame[k]) then--If it changed, and then just changed back.
 				--Don't track it.
 				if(self.bytesToCheck[k] ~= nil) then countThing = countThing + 1 end
 				self.bytesToCheck[k] = nil
+			else
+				if(self.bytesToTrack[k] == nil) then 
+					countThing2 = countThing2 + 1 
+					self.bytesToTrack[k] = 0
+				end
+				self.bytesToTrack[k] = self.bytesToTrack[k] + 1
 			end
 		end
-		vba.print("Ignoring "..countThing.." bytes.")
+		vba.print("Ignoring "..countThing.." bytes.  Watching "..countThing2.." bytes.")
 
 	end
 end

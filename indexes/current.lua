@@ -10,6 +10,7 @@ myDecider = dofile('../deciders/current.lua')
 --myObserver = dofile('observers/default.lua')
 myObserver = dofile('../observers/current.lua')
 myMemory = dofile('../memory/default.lua')
+myRecorder = dofile('../recorders/default.lua')
 
 
 keys = {}
@@ -22,10 +23,10 @@ timer = 120;
 
 --Some more setup
 myObserver.Setup(myObserver)
-print(curstate)
+myRecorder.AppendString(myRecorder, "testingSession", "memory", , ""))
+
 --Main loop.
 while(true) do
-
 	--Always call this first.
 	myObserver.Observe(myObserver)
 	--Store what we've got.
@@ -35,15 +36,15 @@ while(true) do
 		timer = timer - 1
 		if(timer == 0) then
 			print("Stage 1 complete: filtered out "..myObserver._removeNoise_totalChanged.."bytes.")
-			curstate = 2
+			curstate = curstate + 1
 		end
-	elseif (curstate == 2) then
+	elseif (curstate < 4) then
 		if(timer == 0) then
 			--Take a snapshot.  Starting next keypress.
 			myObserver.removeLoops(myObserver, 1)
 			curKey = curKey + 1
 			if(curKey == 7) then 
-				curstate = 3
+				curstate = curstate + 1
 				curKey = 1
 				print("finished filtering input")
 			end

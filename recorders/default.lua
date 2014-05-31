@@ -1,6 +1,6 @@
 --We make a recorder object.
 --This allows us to keep track of everything that the script does.
-recorder = {}
+local recorder = {}
 
 --I want to be able to save to a file.
 --I want the recorder to record multiple things at the same time.
@@ -17,14 +17,38 @@ recorder.Files = { count = 0 }
 recorder.session = ""
 
 
+--Appends a string passed in to a directory and file.
+function recorder.AppendString(self, currentSession, fileName, string)
+	self.file = io.open("../memory/"..currentSession.."/"..fileName..".json", "a")
+	print(self.file)
+	io.output(self.file)
+	io.write(string)
+	io.close()
+end
+
+
+--Recursively builds a json object out of a block of data, and returns it as a string.
+function recorder.ToJSON(self, data, json)
+
+	if(type(data) ~= "table") then
+		return data
+	else
+		local toReturn = "{"
+		for k, v in pairs(data) do
+			toReturn = toReturn.."\""..k.."\":"..self.ToJSON(self, v, json)..","
+		end
+		json = json..toReturn.."}"
+		return json
+	end
+end
+
+
 --
 --Creates a session (folder) that we can use to save all of our current data
 --This is done within the current session.
 --
-function recorder.createSession(sessionName)
-	
-end
 
-function recorder.recordLine()
-	
-end
+
+
+
+return recorder

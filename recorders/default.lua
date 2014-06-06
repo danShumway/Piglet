@@ -20,10 +20,9 @@ recorder.session = ""
 --Appends a string passed in to a directory and file.
 function recorder.AppendString(self, currentSession, fileName, string)
 	self.file = io.open("../memory/"..currentSession.."/"..fileName..".json", "a")
-	print(self.file)
 	io.output(self.file)
 	io.write(string)
-	io.close()
+	--io.close()
 end
 
 
@@ -40,6 +39,21 @@ function recorder.ToJSON(self, data, json)
 		json = json..toReturn.."}"
 		return json
 	end
+end
+
+--We assume that you're passing in a honking large array of data.
+function recorder.Memory(self, memory, currentSession, fileName)
+	--local toReturn = "["
+	self.file = io.open("../memory/"..currentSession.."/"..fileName..".json", "a")
+	io.write("[")
+	for a=1, (256*16*16)-1 do
+		--toReturn = toReturn..memory[a]..","
+		io.write(memory[a], ",")
+	end
+	--toReturn = toReturn..memory[256*16*16].."]"
+	io.write("], ")
+	--io.close()
+	return toReturn;
 end
 
 

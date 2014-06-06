@@ -65,8 +65,7 @@ function List.Pop(self) --back
 			self[self.LastIndex] = nil
 			self.LastIndex	= self.LastIndex - 1 --We don't end there anymore.
 			self.Count = self.Count - 1 --Update count.
-
-			return toReturn; --Send Data.
+			return toReturn --Send Data.
 		end
 
 	end

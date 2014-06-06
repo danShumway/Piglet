@@ -23,7 +23,13 @@ timer = 120;
 
 --Some more setup
 myObserver.Setup(myObserver)
-myRecorder.AppendString(myRecorder, "testingSession", "memory", , ""))
+myRecorder.AppendString(myRecorder, "testingSession", "memory", "{ frames=[")
+
+function memorySave(i, data)
+	myRecorder.Memory(myRecorder, data, "testingSession", "memory")
+	--print("converted to JSON")
+	--myRecorder.AppendString(myRecorder, "testingSession", string)
+end
 
 --Main loop.
 while(true) do
@@ -31,6 +37,10 @@ while(true) do
 	myObserver.Observe(myObserver)
 	--Store what we've got.
 	myMemory.Store(myMemory, myDecider.currentKeysPressed, myObserver.currentFrame, myObserver.bytesChanged)
+	myMemory.CheckStore(myMemory, memorySave)
+
+
+
 	if (curstate == 1) then
 		myObserver.removeNoise(myObserver)
 		timer = timer - 1

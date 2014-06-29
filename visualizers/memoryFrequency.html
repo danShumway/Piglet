@@ -3,45 +3,64 @@
 <head>
 	<title>Memory Frequency Visualizer</title>
 	<script type="text/javascript" src="libraries/jquery-2.1.1.min.js"></script>
-	<script type="text/javascript" src="../memory/testingSession/output.json"></script>
+	<script type="text/javascript" src="../memory/testingSession/total.json"></script>
 
 	<script>
 		 $(document).ready(function(e) {
-			//Organize and view by frequency.
-			var results = [];
-			$.each(data.watchedFrames, function(_data) {
-				var addToResults = new Array();
-				for(var k in data.watchedFrames[_data])
-				{
-					addToResults.push({"id":k, "value":data.watchedFrames[_data][k]});
-				}
+		 	var style = "both"
+		 	var canvas, ctx;
+		 	var posX = 0;
+		 	var scale = .5;
 
-				addToResults.sort(function(a, b){
-					if(a.value >= b.value) return -1; 
-					else return 1;
-				});
+		 	var toDraw = {
+		 		"left" : {"color": "#00ff00", "active":true},
+		 		"right" : {"color": "#00ff00", "active":true},
+		 		"default" : {"color": "#fff000", "active":true},
+		 		"A" : {"color": "#0001ff", "active":true}
+		 	}
 
-				results.push(addToResults);
-			});
 
-			//alert('worked: ' + results[1][0].value);
-			var display = document.getElementById("results");
-			var string = "";
-			for(var i=0; i<results.length; i++){
-				for(var j=0; j<results[i].length; j++){
-					string += "<br />" + results[i][j].id + " :" + results[i][j].value;
-				}
-				string+= "<br /> ------------------------------------";
-			}
-			display.innerHTML = string;
+		 	canvas = document.getElementById("visualizer");
+		 	ctx = canvas.getContext("2d");
+		 	//for(i=0; i < /*256*16*16*/; i++){
+
+		 	draw();
+
+		 	canvas.onmousemove = function(e){
+		 		posX = Math.floor(e.pageX/1920 * (256*16*16));
+		 		console.log(posX)
+		 		draw(posX);
+		 	}
+
+
+
+		 	function draw(posX){
+		 		ctx.clearRect(0,0,1920,800)
+		 		ctx.fillStyle = "#888888"
+		 		ctx.fillRect(0,0,1920, 800)
+			 	var n = 0;
+			 	//for (var i in left) {
+			 	for(i = posX; i < posX + 1920/scale; i++){
+			 		if(total[i] != undefined){
+			 			/*ctx.fillStyle="#000000";
+			 			ctx.fillRect(n, 500, 1, left[i]["default"]);
+			 			ctx.fillStyle="#FF0000";
+			 			ctx.fillRect(n, 500, 1, left[i].left)*/
+			 			for(var c in toDraw) {
+			 				ctx.fillStyle = toDraw[c].color;
+			 				ctx.fillRect((i-posX)*scale, 400, scale, -total[i][c]);
+			 			}
+
+			 		}
+			 	}
+			 }
 		});
 	</script>
 </head>
 
 <body>
-	<div id="results">
-		
-	</div>
+	<canvas id="visualizer" width="1920px", height="800px"></canvas>
+	
 </body>
 
 

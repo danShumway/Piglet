@@ -13,8 +13,8 @@
 dofile('../interfaces/List.lua')
 
 --Load in the modules
-myObserver = dofile('../observers/watcher.lua')
-myRecorder = dofile('../recorders/causalResults.lua')
+myObserver = dofile('../observers/current.lua')
+myRecorder = dofile('../recorders/printChangerTest.lua')
 saved = false
 
 
@@ -33,21 +33,34 @@ keys = {}
 --Main loop.
 
 myObserver.Setup(myObserver)
+
 while(true) do
 
 	myObserver.Observe(myObserver)
-	vba.message(memory.readbyte(43254))
-	if(input.get().shift == true) then
-		--memory.writebyte(41473, 80)
-		--memory.writebyte(65409, 16)
-		--vba.message(memory.readbyte(65409).." - "..memory.readbyte(65410))
-		--vba.message(memory.readbyte(65070))
 
-		myObserver.Conclude(myObserver)
-		--myRecorder.Memory(myRecorder, myObserver.finalConclude, "testingSession", "rightHeldDown")
+	if(input.get().control == true) then
+		--memory.writebyte(44849, 10)
+	end
+
+
+	--vba.message(myObserver.GetByte(65475).." "..myObserver.GetByte(44849).." "..myObserver.GetByte(65466))
+
+	--Save what you currently have.
+	if(input.get().shift == true and saved == false) then
+		--myObserver.Conclude(myObserver)
+		myRecorder.Memory(myRecorder, myObserver.watcherObj.effects, "testingSession", "total")
 		saved = true
-	else
+	end
+	if(input.get().shift ~= true) then
 		saved = false
 	end
+
+	if(input.get().tab == true) then
+		print("switching to left check")
+		myObserver.watcherObj.currentlyWatching = "key_left"
+	end
+
+	--Advance frame.
 	vba.frameadvance()
+
 end

@@ -9,13 +9,23 @@ function recorder.Memory(self, memory, currentSession, fileName)
 	self.file:write("var ", fileName," = {")
 	for a=1, (256*16*16) do
 		--toReturn = toReturn..memory[a]..","
-		if(memory[a] > 0) then
-			self.file:write('"',a,'":',memory[a], ",")
-		end
+		--if(memory[a]["key_left"] ~= nil) then
+		--	if(memory[a]["key_left"] >= -300) then
+				self.file:write('"',a,'": { "default":',Value(memory[a]["default"])
+					,', "left": ', Value(memory[a]["key_left"])
+				 	, ',"right": '
+				 	, Value(memory[a]["key_right"]),', "A": ', Value(memory[a]["key_A"]), " },\n")
+		--	end
+		--end
 	end
 	self.file:write("};")
 	self.file:close()
 	print("saved")
+end
+
+function Value(value)
+	if(value ~= nil) then return value end
+	return 0
 end
 
 

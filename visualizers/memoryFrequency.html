@@ -11,12 +11,37 @@
 		 	var canvas, ctx;
 		 	var posX = 0;
 		 	var scale = .5;
+		 	var mousedown = {"down":false, "position":0}
 
 		 	var toDraw = {
-		 		"left" : {"color": "#00ff00", "active":true},
-		 		"right" : {"color": "#00ff00", "active":true},
+		 		"key_left" : {"color": "#00ff00", "active":true},
+		 		"key_right" : {"color": "#00ff00", "active":true},
 		 		"default" : {"color": "#fff000", "active":true},
-		 		"A" : {"color": "#0001ff", "active":true}
+		 		"key_A" : {"color": "#0001ff", "active":true}
+		 	}
+
+		 	for (var c in total[1]) {
+		 		if(toDraw[c] == undefined) {
+		 			toDraw[c] = {"color": "#000000", "active":true};
+		 		}
+		 	}
+
+		 	for (var c in toDraw) {
+		 		var checkbox = document.createElement('input');
+		 		checkbox.type = 'checkbox';
+		 		checkbox.name = c;
+		 		checkbox.value = true;
+		 		checkbox.id = c;
+		 		checkbox.checked = true;
+		 		checkbox.onclick = function(e){ draw(posX) }
+
+		 		var label = document.createElement('label')
+		 		label.htmlFor = c;
+		 		label.appendChild(document.createTextNode(c));
+
+		 		var appendTo = document.getElementById('checkboxes')
+		 		appendTo.appendChild(checkbox);
+		 		appendTo.appendChild(label);
 		 	}
 
 
@@ -24,12 +49,22 @@
 		 	ctx = canvas.getContext("2d");
 		 	//for(i=0; i < /*256*16*16*/; i++){
 
-		 	draw();
+		 	draw(posX);
 
 		 	canvas.onmousemove = function(e){
-		 		posX = Math.floor(e.pageX/1920 * (256*16*16));
-		 		console.log(posX)
-		 		draw(posX);
+		 		if(mousedown.down){
+			 		posX = Math.floor((e.pageX)/1920 * (256*16*16));
+			 		draw(posX);
+			 	}
+		 	}
+
+		 	canvas.onmousedown = function(e){
+		 		mousedown.down = true;
+		 		mousedown.position = e.pageX
+		 		canvas.onmousemove(e);
+		 	}
+		 	canvas.onmouseup = function(e){
+		 		mousedown.down = false;
 		 	}
 
 
@@ -47,8 +82,10 @@
 			 			ctx.fillStyle="#FF0000";
 			 			ctx.fillRect(n, 500, 1, left[i].left)*/
 			 			for(var c in toDraw) {
-			 				ctx.fillStyle = toDraw[c].color;
-			 				ctx.fillRect((i-posX)*scale, 400, scale, -total[i][c]);
+			 				if(document.getElementById(c).checked){
+				 				ctx.fillStyle = toDraw[c].color;
+				 				ctx.fillRect((i-posX)*scale, 400, scale, -total[i][c]*2);
+				 			}
 			 			}
 
 			 		}
@@ -60,7 +97,7 @@
 
 <body>
 	<canvas id="visualizer" width="1920px", height="800px"></canvas>
-	
+	<div id="checkboxes"></div>
 </body>
 
 

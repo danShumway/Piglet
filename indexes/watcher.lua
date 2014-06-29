@@ -48,7 +48,7 @@ while(true) do
 	--Save what you currently have.
 	if(input.get().shift == true and saved == false) then
 		--myObserver.Conclude(myObserver)
-		myRecorder.Memory(myRecorder, myObserver.watcherObj.effects, "testingSession", "total")
+		myRecorder.Memory(myRecorder, myObserver.watcherObj.effects, "testingSession", "total", myObserver.watcherObj.canCheck)
 		saved = true
 	end
 	if(input.get().shift ~= true) then

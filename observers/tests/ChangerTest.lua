@@ -21,21 +21,31 @@ watching.shouldCheck = false
 watching.decayRate = 10
 watching.decay = 10
 
+
 --Set up a list of states that you can check.  This will by dynamically updated as we go.
 watching.canCheck = {}
-watching.canCheck[1] = "key_left"
-watching.canCheck[2] = "key_right"
-watching.canCheck[3] = "key_up"
-watching.canCheck[4] = "key_down"
-watching.canCheck[5] = "key_A"
-watching.canCheck[6] = "key_B"
-watching.canCheck[7] = "default"
+watching.checkingCount = 7
+watching.canCheck[1] = {string = "key_left", certainty = 0}
+watching.canCheck[2] = {string = "key_right", certainty = 0}
+watching.canCheck[3] = {string = "key_up", certainty = 0}
+watching.canCheck[4] = {string = "key_down", certainty = 0}
+watching.canCheck[5] = {string = "key_A", certainty = 0}
+watching.canCheck[6] = {string = "key_B", certainty = 0}
+watching.canCheck[7] = {string = "default", certainty = 0}
 --watching.cancheck[3] = 
+watching.added = {}
 
-function watching.resetNextFrame(self, memory, keys)
+watching.curFrame = nil
+watching.prevFrame = nil
+
+function watching.resetNextFrame(self, curFrame, prevFrame, keys)
 	self.statesChecked = {}
-	self.currentlyWatching = self.canCheck[math.random(1,7)]
-	self.shouldCheck = self.checkState(self, self.currentlyWatching, memory, keys)
+	self.currentlyWatchingObj = self.canCheck[math.random(1,self.checkingCount)]
+	self.currentlyWatchingObj.certainty = self.currentlyWatchingObj.certainty + 1
+	self.currentlyWatching = self.currentlyWatchingObj.string
+	self.curFrame = curFrame
+	self.prevFrame = prevFrame
+	self.shouldCheck = self.checkState(self, self.currentlyWatching, keys)
 	--Reset whatever else need to be reset here.
 
 	self.decay = self.decay - 1
@@ -51,7 +61,7 @@ function watching.tallyScore(self, state, currentByte, currentByteChange, keys)
 		for k, v in pairs(self.effects[currentByte]) do
 			if (k ~= state) then --I don't want to include what I'm currently checking into the whole expected, unexpected
 				if(self.statesChecked[k] == nil) then --If we haven't checked it yet, check it.
-					self.statesChecked[k] = self.checkState(self, k, changes, keys)
+					self.statesChecked[k] = self.checkState(self, state, keys)
 				end
 				--Now we do the actual check
 				if(self.statesChecked[k] == true) then
@@ -77,13 +87,19 @@ function watching.tallyScore(self, state, currentByte, currentByteChange, keys)
 				self.effects[currentByte][state] = self.effects[currentByte][state] + 1 --This is slightly more likely to make the byte change.
 			else
 				self.effects[currentByte][state] = 1 --Add it as a new possible cause.
+				--If we haven't put this up for consideration yet, add it to the list.  And we're only adding a few frames for now, so keep that in mind.
+				if(self.checkingCount < 13 and self.added[currentByte] == nil and state ~= "default") then
+					self.checkingCount = self.checkingCount + 1
+					self.canCheck[self.checkingCount] = { string="mem_"..currentByte, certainty=0 }
+					self.added[currentByte] = true
+				end
 			end
 		else
 			--Decay here if nothing interesting happened.  Like you're forgetting almost.
 			if(self.decay == 0 and self.effects[currentByte][state] ~= nil) then --We gravitate towards 0 if behaviors aren't reinforced.
 				if(self.effects[currentByte][state] > 0) then 
 					self.effects[currentByte][state] = self.effects[currentByte][state] - 1
-				elseif(self.effects[currentByte][state] < 0) then
+				elseif(self.effects[currentByte][state] < 0) then 
 					self.effects[currentByte][state] = self.effects[currentByte][state] + 1
 				end
 			end
@@ -94,7 +110,7 @@ function watching.tallyScore(self, state, currentByte, currentByteChange, keys)
 	end
 end
 
-function watching.checkState(self, state, changes, keys)
+function watching.checkState(self, state, keys)
 	local translate = {}
 	local i = 1
 	for item in string.gmatch(state, "([^_]+)_?") do
@@ -102,15 +118,15 @@ function watching.checkState(self, state, changes, keys)
       i = i +1
     end
 	--local translate = string.gmatch(state, "([^_]+)_?")
-
 	if(state == "default") then 
-
 		return true 
 	end --This is always true.  It's something that changes kind of regardless of what's pressed, or at least by default.
 
 	--All our states start with what to check.
 	if(translate[1] == "mem") then
-		if(changes[translate[2]] ~= 0) then
+		--print(translate[2])
+		translate[2] = tonumber(translate[2])
+		if(self.curFrame[translate[2]] - self.prevFrame[translate[2]] ~= 0) then
 			return true
 		end
 		return false --Hasn't changed.

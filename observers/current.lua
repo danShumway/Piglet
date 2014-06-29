@@ -69,7 +69,7 @@ function observer.Observe(self)
 
 	if(self.lastFrame ~= false) then
 		--Loop through memory and see what you can see.
-		self.watcherObj.resetNextFrame(self.watcherObj, self.currentFrame, self.currentInput)
+		self.watcherObj.resetNextFrame(self.watcherObj, self.currentFrame, self.lastFrame, self.currentInput)
 		--print(self.currentFrame[65521])
 		--vba.message("s: "..self.currentFrame[42275]..", c: "..self.currentFrame[65466])
 		vba.message(self.watcherObj.currentlyWatching)

@@ -3,7 +3,7 @@
 local recorder = {}
 
 --We assume that you're passing in a honking large array of data.
-function recorder.Memory(self, memory, currentSession, fileName)
+function recorder.Memory(self, memory, currentSession, fileName, values)
 	--local toReturn = "["
 	self.file = io.open("../memory/"..currentSession.."/"..fileName..".json", "w")
 	self.file:write("var ", fileName," = {")
@@ -11,10 +11,15 @@ function recorder.Memory(self, memory, currentSession, fileName)
 		--toReturn = toReturn..memory[a]..","
 		--if(memory[a]["key_left"] ~= nil) then
 		--	if(memory[a]["key_left"] >= -300) then
-				self.file:write('"',a,'": { "default":',Value(memory[a]["default"])
-					,', "left": ', Value(memory[a]["key_left"])
-				 	, ',"right": '
-				 	, Value(memory[a]["key_right"]),', "A": ', Value(memory[a]["key_A"]), " },\n")
+				self.file:write('"',a,'": { ')
+				for k, v in pairs(values) do
+					self.file:write('"', v.string,'":', Value(memory[a][v.string]), ', ')
+				end
+				-- self.file:write('default":',Value(memory[a]["default"])
+				-- 	,', "left": ', Value(memory[a]["key_left"])
+				--  	, ',"right": '
+				--  	, Value(memory[a]["key_right"]),', "A": ', Value(memory[a]["key_A"]))
+				 self.file:write(" },\n")
 		--	end
 		--end
 	end

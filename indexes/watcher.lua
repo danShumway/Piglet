@@ -15,10 +15,12 @@ dofile('../interfaces/List.lua')
 --Load in the modules
 myObserver = dofile('../observers/current.lua')
 myRecorder = dofile('../recorders/printChangerTest.lua')
+myDecider = dofile('../deciders/changerTest.lua')
 saved = false
 
 
 keys = {}
+selfInput = false
 
 -- --Some more setup
 -- myObserver.Setup(myObserver)
@@ -48,7 +50,7 @@ while(true) do
 	--Save what you currently have.
 	if(input.get().shift == true and saved == false) then
 		--myObserver.Conclude(myObserver)
-		myRecorder.Memory(myRecorder, myObserver.watcherObj.effects, "testingSession", "total", myObserver.watcherObj.canCheck)
+		myRecorder.Memory(myRecorder, myObserver.watcherObj.effects, "testingSession", "total", myObserver.watcherObj.inactiveChecks)
 		saved = true
 	end
 	if(input.get().shift ~= true) then
@@ -56,8 +58,15 @@ while(true) do
 	end
 
 	if(input.get().tab == true) then
-		print("switching to left check")
-		myObserver.watcherObj.currentlyWatching = "key_left"
+		print("switching to self input")
+		selfInput = true
+		myDecider.effects = myObserver.watcherObj.effects
+		myDecider.goal = myObserver.watcherObj.mostRecentAddedValue
+		----myObserver.watcherObj.currentlyWatching = "key_left"
+	end
+
+	if(selfInput) then
+		myDecider.decide(myDecider)
 	end
 
 	--Advance frame.

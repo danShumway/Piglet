@@ -12,8 +12,14 @@ function recorder.Memory(self, memory, currentSession, fileName, values)
 		--if(memory[a]["key_left"] ~= nil) then
 		--	if(memory[a]["key_left"] >= -300) then
 				self.file:write('"',a,'": { ')
-				for k, v in pairs(values) do
-					self.file:write('"', v.string,'":', Value(memory[a][v.string]), ', ')
+				if(memory[a] ~= nil) then
+					for k, v in pairs(values) do
+						self.file:write('"', v.string,'":', Value(memory[a][v.string]), ', ')
+					end
+				else
+					for k, v in pairs(values) do
+						self.file:write('"', v.string,'":', Value(nil), ', ')
+					end
 				end
 				-- self.file:write('default":',Value(memory[a]["default"])
 				-- 	,', "left": ', Value(memory[a]["key_left"])

@@ -22,7 +22,8 @@
 
 		 	for (var c in total[1]) {
 		 		if(toDraw[c] == undefined) {
-		 			toDraw[c] = {"color": "#000000", "active":true};
+
+		 			toDraw[c] = {"color": '#'+Math.floor(Math.random()*16777215).toString(16), "active":true};
 		 		}
 		 	}
 

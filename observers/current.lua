@@ -74,6 +74,14 @@ function observer.Observe(self)
 		--vba.message("s: "..self.currentFrame[42275]..", c: "..self.currentFrame[65466])
 		vba.message(self.watcherObj.currentlyWatching)
 		if(self.watcherObj.shouldCheck) then
+
+
+			local start = math.random(1, (256*16*16) - 10000)
+
+			--for a=start, start+10000 do
+			--	self.watcherObj.tallyScore(self.watcherObj, self.watcherObj.currentlyWatching, a, self.lastFrame[a] - self.currentFrame[a], self.currentInput)
+
+
 			for a=1, 256*16*16 do
 				self.watcherObj.tallyScore(self.watcherObj, self.watcherObj.currentlyWatching, a, self.lastFrame[a] - self.currentFrame[a], self.currentInput)
 

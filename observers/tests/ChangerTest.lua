@@ -22,34 +22,102 @@ watching.decayRate = 10
 watching.decay = 10
 
 
---Set up a list of states that you can check.  This will by dynamically updated as we go.
-watching.canCheck = {}
-watching.checkingCount = 7
-watching.canCheck[1] = {string = "key_left", certainty = 0}
-watching.canCheck[2] = {string = "key_right", certainty = 0}
-watching.canCheck[3] = {string = "key_up", certainty = 0}
-watching.canCheck[4] = {string = "key_down", certainty = 0}
-watching.canCheck[5] = {string = "key_A", certainty = 0}
-watching.canCheck[6] = {string = "key_B", certainty = 0}
-watching.canCheck[7] = {string = "default", certainty = 0}
---watching.cancheck[3] = 
+
+ 
 watching.added = {}
+
+--These are the states Piglet can check at any given moment.
+watching.activeChecks = {}
+watching.activeCheckCount = 7
+watching.activeChecks["key_left"] = {string = "key_left", certainty = 0}
+watching.activeChecks["key_right"] = {string = "key_right", certainty = 0}
+watching.activeChecks["key_up"] = {string = "key_up", certainty = 0}
+watching.activeChecks["key_down"] = {string = "key_down", certainty = 0}
+watching.activeChecks["key_A"] = {string = "key_A", certainty = 0}
+watching.activeChecks["key_B"] = {string = "key_B", certainty = 0}
+watching.activeChecks["default"] = {string = "default", certainty = 0}
+
+--These are the states Piglet is no longer trying to learn about.
+watching.inactiveChecks = {}
+watching.inactiveCheckCount = 0
+
+--This is how many checks Piglet would like to do on a frame before she moves on to something else.
+watching.idealCertainty = 50
+
+watching.mostRecentAddedValue = ""
+
 
 watching.curFrame = nil
 watching.prevFrame = nil
 
 function watching.resetNextFrame(self, curFrame, prevFrame, keys)
 	self.statesChecked = {}
-	self.currentlyWatchingObj = self.canCheck[math.random(1,self.checkingCount)]
-	self.currentlyWatchingObj.certainty = self.currentlyWatchingObj.certainty + 1
-	self.currentlyWatching = self.currentlyWatchingObj.string
-	self.curFrame = curFrame
-	self.prevFrame = prevFrame
-	self.shouldCheck = self.checkState(self, self.currentlyWatching, keys)
-	--Reset whatever else need to be reset here.
 
-	self.decay = self.decay - 1
-	if(self.decay < 0) then self.decay = self.decayRate end
+	local randIndex = math.random(1, self.activeCheckCount)
+	local i = 1 --We exploit a foreach loop to grab a random element.
+	for k, v in pairs(self.activeChecks) do
+		if(i == randIndex) then 
+			self.currentlyWatchingObj = v
+			break --Loop through until you get to the next thing to watch. 
+		end
+		i = i + 1
+	end
+
+	--If we're certain we know what's going on.
+	if(self.currentlyWatchingObj.certainty > self.idealCertainty) then
+		--Move it to the inactiveChecks list.
+		self.inactiveChecks[self.currentlyWatchingObj.string] = self.currentlyWatchingObj
+		self.activeChecks[self.currentlyWatchingObj.string] = nil
+
+		--Update the counts.
+		self.activeCheckCount = self.activeCheckCount - 1
+		self.inactiveCheckCount = self.inactiveCheckCount + 1
+
+		--Learn from the frame and figure out what you want to look at next.
+		local bestGrab = {value="0", certainty=0}
+		for a=1, (256*16*16) do
+			if(self.effects[a][self.currentlyWatchingObj.string] ~= nil) then
+
+				if( self.effects[a][self.currentlyWatchingObj.string] >= bestGrab.certainty) then
+					--Don't recheck things we've already checked.
+					if(self.activeChecks["mem_"..a] == nil and self.inactiveChecks["mem_"..a] == nil) then
+						bestGrab.value = "mem_"..a
+						bestGrab.certainty = self.effects[a][self.currentlyWatchingObj.string]
+					end
+				end
+			end
+		end
+
+
+		print("Finished checking "..self.currentlyWatchingObj.string..", going to start checking "..bestGrab.value)
+		self.activeCheckCount = self.activeCheckCount + 1
+		self.activeChecks[bestGrab.value] = { string=bestGrab.value, certainty=0 }
+		self.added[bestGrab.value] = true
+		self.mostRecentAddedValue = bestGrab.value --Used for testing purposes.
+
+		--Skip this frame.  You've earned it.
+		self.shouldCheck = false
+		return
+	else
+		--Otherwise.
+		
+		--An uneccessary line that will be removed once other things stop referencing this variable.
+		self.currentlyWatching = self.currentlyWatchingObj.string
+		--I'm also not sure if these lines are necessary.
+		self.curFrame = curFrame
+		self.prevFrame = prevFrame
+		self.shouldCheck = self.checkState(self, self.currentlyWatching, keys)
+
+		--If we're going to check things, we'll become more certain about them.
+		if(self.shouldCheck == true) then 
+			self.currentlyWatchingObj.certainty = self.currentlyWatchingObj.certainty + 1
+		end
+
+		return
+	end
+
+	--self.decay = self.decay - 1
+	--if(self.decay < 0) then self.decay = self.decayRate end
 end
 
 
@@ -88,11 +156,11 @@ function watching.tallyScore(self, state, currentByte, currentByteChange, keys)
 			else
 				self.effects[currentByte][state] = 1 --Add it as a new possible cause.
 				--If we haven't put this up for consideration yet, add it to the list.  And we're only adding a few frames for now, so keep that in mind.
-				if(self.checkingCount < 13 and self.added[currentByte] == nil and state ~= "default") then
-					self.checkingCount = self.checkingCount + 1
-					self.canCheck[self.checkingCount] = { string="mem_"..currentByte, certainty=0 }
-					self.added[currentByte] = true
-				end
+				-- if(self.activeCheckCount < 20 and self.added[currentByte] == nil and state ~= "default") then
+				-- 	self.activeCheckCount = self.activeCheckCount + 1
+				-- 	self.activeChecks[self.activeCheckCount] = { string="mem_"..currentByte, certainty=0 }
+				-- 	self.added[currentByte] = true
+				-- end
 			end
 		else
 			--Decay here if nothing interesting happened.  Like you're forgetting almost.

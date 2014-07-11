@@ -64,13 +64,14 @@ function watching.resetNextFrame(self, curFrame, prevFrame, keys)
 	end
 
 	--If we're certain we know what's going on.
-	if(self.currentlyWatchingObj.certainty > self.idealCertainty) then
+	if(self.currentlyWatchingObj.certainty > self.idealCertainty and self.currentlyWatchingObj.string ~= "default") then
 		--Move it to the inactiveChecks list.
 		self.inactiveChecks[self.currentlyWatchingObj.string] = self.currentlyWatchingObj
-		self.activeChecks[self.currentlyWatchingObj.string] = nil
+		self.currentlyWatchingObj.certainty = 0
+		--self.activeChecks[self.currentlyWatchingObj.string] = nil
 
 		--Update the counts.
-		self.activeCheckCount = self.activeCheckCount - 1
+		--self.activeCheckCount = self.activeCheckCount - 1
 		self.inactiveCheckCount = self.inactiveCheckCount + 1
 
 		--Learn from the frame and figure out what you want to look at next.

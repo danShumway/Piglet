@@ -72,7 +72,15 @@ function observer.Observe(self)
 		self.watcherObj.resetNextFrame(self.watcherObj, self.currentFrame, self.lastFrame, self.currentInput)
 		--print(self.currentFrame[65521])
 		--vba.message("s: "..self.currentFrame[42275]..", c: "..self.currentFrame[65466])
-		vba.message(self.watcherObj.currentlyWatching)
+		--vba.message(self.watcherObj.currentlyWatching)
+		if(self.watcherObj.mostRecentAddedValue ~= nil) then
+			local toSend = self.watcherObj.checkState(self.watcherObj, self.watcherObj.mostRecentAddedValue, self.currentInput);
+			if(toSend == true) then
+				vba.message("happy")
+			else
+				vba.message("sad")
+			end
+		end
 		if(self.watcherObj.shouldCheck) then
 
 

@@ -61,11 +61,12 @@ while(true) do
 		print("switching to self input")
 		selfInput = true
 		myDecider.effects = myObserver.watcherObj.effects
-		myDecider.goal = myObserver.watcherObj.mostRecentAddedValue
 		----myObserver.watcherObj.currentlyWatching = "key_left"
 	end
 
 	if(selfInput) then
+		--This will get updated over time.
+		myDecider.goal = myObserver.watcherObj.mostRecentAddedValue
 		myDecider.decide(myDecider)
 	end
 

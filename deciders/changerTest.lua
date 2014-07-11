@@ -34,6 +34,7 @@ decider.lookedAt = {}
 function decider.chooseInput(self, goal, goalRating)
 	--print(goal)
 	for k, v in pairs(self.effects[tonumber(goal[2])]) do
+		local loop=false
 		--Commented out because for right now, we're going to discourage changes that would negatively effect the byte.
 		--if(k > 0) then --If it's likely to make the byte change.
 			--print(k)
@@ -56,6 +57,7 @@ function decider.chooseInput(self, goal, goalRating)
 					--print(k.." "..v)
 					--self.chooseInput(self, self.interpretGoal(self, k), v)
 				else
+					loop=true
 					--Adjust its rating.
 					if(goalRating > 0) then --If we're currently looking at something positive.
 						self.lookedAt[translation[2]] = self.lookedAt[translation[2]] + v
@@ -73,7 +75,7 @@ function decider.chooseInput(self, goal, goalRating)
 				self.keyValues[translation[2]] = self.lookedAt[translation[2]]
 				--Also, return because we've hit the bottom of a tree.
 				--return --Unecessary, but makes the code easier to read and indicates intent.
-			elseif(translation[1] ~= "default") then --Not a key, means it's memory of some kind.
+			elseif(translation[1] ~= "default" and loop==false) then --Not a key, means it's memory of some kind.
 				--Keep on going down until we find some actual keys to either press or not press.
 				--print(k)
 				--print("isn't key, is "..translation[1])

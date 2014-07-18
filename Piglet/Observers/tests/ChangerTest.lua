@@ -9,6 +9,10 @@
 --That way, we can change it easily later.
 --In fact, all uppercase stuff will be rewritten later.  Just assume it.
 
+
+--Bundle this stuff and stick it in a module.
+
+
 print('hello there from ChangerTest')
 
 local watching = {}

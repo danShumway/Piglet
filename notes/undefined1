@@ -1,0 +1,53 @@
+Let's think about an algorithm.
+
+You want to be able to look for 
+		(a) a cause - or a condition.
+		(b) an effect - or a result.
+
+You know that (b) works.  You don't know that (a) works necessarily.
+
+But I could do (a) in a similar method, right?
+
+I'd do a series of checks.  
+	- First, are any values always constant?
+	- Secondly, are any values matching with each other?  This takes more work.  You're looking at potentially n^2 values.  That goes up dramatically, the deeper we go.
+
+	- Can we cull that down at all?
+			- Sure.  We can look at values that we can affect, and only analyze those.  
+				- Oh my gosh.  Can we?  We totally can, can't we?  
+
+		- So don't start analyzing causes.  Start out analyzing effects.
+
+	Speaking of that, what are the steps of analyzing an effect?
+
+	a) What values change when I press a button(?)
+			- start press
+			- end press
+			- whatever else.... but let's start with just holding down and see how that goes.
+
+	b) so when a value is held true (either a key down, or something else-> )
+		- 1) we check to see what changes (ie, changeCount when state is true - changeCount when state is false)
+
+		- 2) the adress(es) with the highest value is selected as the effect.
+
+		- 3) we stop watching those values for future stuff.
+
+	c) we can make a level 2 step, where we take our current changes and try to see what they change by and how much that is - essentially, we refine and add in some parameters.
+		- 1) So we take the things that we know are changing, and we check to see how much their changing by on each frame.
+		- 2) Is it consistent?  Do they seem to be changing by a random amount, or is there a pattern?
+		- 3) If it's a random amount, are there any other values that match what it's changing by?
+
+	d) once we have a more informed opinion about how it's changing, we have a number of events we can draw from it.
+		- 1) What happens when it changes?
+		- 2) What happens when it hits a specific value?
+				- a) this is much more tricky.  Looping is the obvious example, but there are other reasons we might call out a spot as being an event...  ie, something unexpected happens, and we look at those bytes to figure out how it happened.
+
+------- Theoretically --------------->
+
+		- we don't need anything else but that.  When a byte you can effect, does something unexpected - or you have anything you want to check out, you check the values on the bytes you can effect to see if they matched up with each other, or if they equaled something else, or whatever.
+
+		- But how would you know that something happened, other than you inputs not working?
+
+		- And how would you revise it later????  You'd want to remember your previous conclusions.... or go back and test them... or what?
+
+		So is this the last part????  I think so.  And maybe the solution is (does something unexpected) - and the question is, is this an isolated case, or is it a pattern.

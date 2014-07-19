@@ -45,8 +45,8 @@ Piglet.Memory.Short = {}
 
 --We don't have an accessible long.  What long should be is a class that pulls data and puts it into short.
 
-Piglet.Eye = {}
-Piglet.Hand = {}
+Piglet.Eye = dofile('Hardware/eye.lua')
+Piglet.Hand = dofile('Hardware/hand.lua')
 
 
 --[[

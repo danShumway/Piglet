@@ -1,10 +1,4 @@
-dofile('../interfaces/List.lua')
-local hrt= dofile("../interfaces/Timer.lua")
-
---Load in any necessary modules.
-observer = dofile('../observers/current.lua')
-recorder = dofile('../recorders/printChangerTest.lua')
-decider = dofile('../deciders/changerTest.lua')
+print('hello')
 
 
 --[[
@@ -40,13 +34,14 @@ and stores that in instant memory as well.
 
 --ToDo: replace these with classes that wrap around the data structures.
 Piglet.Memory = {}
-Piglet.Memory.Instant = {}
+Piglet.Memory.Instant = dofile('memory/Instant/instant.lua')
 Piglet.Memory.Short = {}
 
 --We don't have an accessible long.  What long should be is a class that pulls data and puts it into short.
 
-Piglet.Eye = dofile('Hardware/eye.lua')
-Piglet.Hand = dofile('Hardware/hand.lua')
+Piglet.Hardware = {}
+Piglet.Hardware.Eye = dofile('Hardware/eye.lua')
+Piglet.Hardware.Hand = dofile('Hardware/hand.lua')
 
 
 --[[
@@ -57,9 +52,9 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 -----------------------------------------------------------------------------------
 --]]
 
-Piglet.Observer = {}
-Piglet.Processor = {}
-Piglet.Decider = {}
+Piglet.Observer = dofile('Observers/observer.lua')
+Piglet.Processor = {}--dofile('')
+Piglet.Decider = dofile('Deciders/decider.lua')
 
 
 --[[
@@ -73,8 +68,11 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 --Piglet has a mental tick
 function Piglet.tick()
 	--Observe Information
+	Piglet.Observer.observe()
 	--Process Relevant Information
+	--
 	--Decide Input
+	Piglet.Decider.pickKeys()
 end
 
 
@@ -91,7 +89,7 @@ while(true) do
 	--Piglet sees.
 	--Eye
 
-	tick(dx); --Call the main loop, passing in the elapsed time since the last frame.
+	Piglet.tick(dx); --Call the main loop, passing in the elapsed time since the last frame.
 	draw(dx); --Draw anything required to the screen.
 
 	vba.frameadvance() --Advance the emulator one frame.

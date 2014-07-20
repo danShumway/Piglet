@@ -24,5 +24,9 @@ function hand.getKeys()
 	return currentlyHolding
 end
 
+function hand.getAvailableKeys()
+	return {"A", "B", "left", "right", "up", "down", "start"}
+end
+
 
 return hand;

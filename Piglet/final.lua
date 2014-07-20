@@ -40,8 +40,8 @@ and stores that in instant memory as well.
 
 --ToDo: replace these with classes that wrap around the data structures.
 Piglet.Memory = {}
-Piglet.Memory.Instant = {}
-Piglet.Memory.Short = {}
+Piglet.Memory.Instant = dofile('Memory/Instant/instant.lua')
+Piglet.Memory.Short = {}--dofile('Memory/Shor')
 
 --We don't have an accessible long.  What long should be is a class that pulls data and puts it into short.
 

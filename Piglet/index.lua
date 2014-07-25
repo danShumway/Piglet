@@ -71,7 +71,7 @@ function Piglet.tick()
 	--Observe Information
 	Piglet.Observer.observe()
 	--Process Relevant Information
-	Piglet.Processor.process()
+		Piglet.Processor.process()
 	--Decide Input
 	Piglet.Decider.pickKeys()
 end
@@ -82,6 +82,14 @@ end
 --Note that this is not attached to Piglet.
 function draw()
 
+	local toPrint = ' '
+	local keys = joypad.get(1)
+	for key, value in pairs(keys) do
+		if(value == true) then
+			toPrint = toPrint..key..' '
+		end
+	end
+	vba.message(toPrint)
 end
 
 

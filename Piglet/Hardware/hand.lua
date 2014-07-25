@@ -25,7 +25,7 @@ function hand.getKeys()
 end
 
 function hand.getAvailableKeys()
-	return {"A", "B", "left", "right", "up", "down", "start"}
+	return {"A", "B", "left", "right", "up", "down"}--, "start"}
 end
 
 

@@ -35,7 +35,7 @@ and stores that in instant memory as well.
 --ToDo: replace these with classes that wrap around the data structures.
 Piglet.Memory = {}
 Piglet.Memory.Instant = dofile('memory/Instant/instant.lua')
-Piglet.Memory.Short = {}
+Piglet.Memory.Short = dofile('memory/Short/short.lua')
 
 --We don't have an accessible long.  What long should be is a class that pulls data and puts it into short.
 
@@ -52,8 +52,9 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 -----------------------------------------------------------------------------------
 --]]
 
+--Should probably be a brain ({}) object here.  Maybe add one in the future.
 Piglet.Observer = dofile('Observers/observer.lua')
-Piglet.Processor = {}--dofile('')
+Piglet.Processor = dofile('Processors/processor.lua')
 Piglet.Decider = dofile('Deciders/decider.lua')
 
 
@@ -70,7 +71,7 @@ function Piglet.tick()
 	--Observe Information
 	Piglet.Observer.observe()
 	--Process Relevant Information
-	--
+		Piglet.Processor.process()
 	--Decide Input
 	Piglet.Decider.pickKeys()
 end
@@ -81,6 +82,14 @@ end
 --Note that this is not attached to Piglet.
 function draw()
 
+	local toPrint = ' '
+	local keys = joypad.get(1)
+	for key, value in pairs(keys) do
+		if(value == true) then
+			toPrint = toPrint..key..' '
+		end
+	end
+	vba.message(toPrint)
 end
 
 

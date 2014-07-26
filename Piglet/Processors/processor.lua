@@ -8,10 +8,11 @@ function processor.process()
 	--We'll potentially deal with this differently in the future.
 	Piglet.Memory.Short.forgetStates()
 
-	test.doFull()
-	processor.pickGoal()
+	test.reverse()
+	--processor.pickGoal()
 
-	print(Piglet.Memory.Short.currentGoal.address)
+	--print(Piglet.Memory.Short.currentGoal.address)
+	--print(Piglet.Memory.Short.currentGoa)
 
 end
 
@@ -20,6 +21,7 @@ function processor.pickGoal()
 	local bestGoal = {}
 	bestGoal.address = 0
 	bestGoal.rating = 0
+	bestGoal.goal = "mem_0"
 
 	for k, v in pairs(Piglet.Memory.Instant.currentChanges) do
 		local currentRating = 0
@@ -28,14 +30,15 @@ function processor.pickGoal()
 		if(causes ~= nil) then
 			for k_2, v_2 in pairs(causes) do
 				-- + (1 minus the difference between it and .5)
-				--currentRating = currentRating + (1 - math.abs(v_2.chance - .5))
+				currentRating = currentRating + (1 - math.abs(v_2.chance - .5))
 				-- + (the difference between it and .5)
-				currentRating = currentRating + (math.abs(v_2.chance - .5) - .1)
+				--currentRating = currentRating + (math.abs(v_2.chance - .5) - .1)
 			end
 			--Check to see if it's a good goal.
 			if(currentRating > bestGoal.rating) then
 				bestGoal.address = k
 				bestGoal.rating = currentRating
+				bestGoal.goal = "mem_"..k
 			end
 		end
 	end
@@ -47,9 +50,9 @@ end
 --This way we can build up a causal relationship.  If something changes 1 frame,
 --and something else changes on the next frame, that's a relationship.
 function processor.checkPastState(state)
-	if(short.getState(state) ~= -1) then
+	if(Piglet.Memory.Short.getState(state) ~= -1) then
 		--If we already know, just return it.
-		return short.getState(state)
+		return Piglet.Memory.Short.getState(state)
 	else
 		--Otherwise, let's parse the state.
 		local translate = {}
@@ -76,7 +79,7 @@ function processor.checkPastState(state)
 			Piglet.Memory.Short.setState(state, 0)
 			return 0 --Hasn't changed.
 		elseif(translate[1] == "key") then
-			if(Piglet.Hardware.Hands.getKeys()[translate[2]] ~= nil) then
+			if(Piglet.Hardware.Hand.getKeys()[translate[2]] ~= nil) then
 				--Set state and return true.
 				Piglet.Memory.Short.setState(state, 1)
 				return 1

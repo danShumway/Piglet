@@ -3,10 +3,13 @@ local short = {}
 --Causes are used here with percentage values.
 local causes = {}
 local states = {}
-local watching = {}
+short.watching = {key_left=1, key_right=1, key_up=1, key_down=1, key_A=1, key_B=1, key_select=1, default=1}
+short.currentGoal = {}
+short.currentGoal.address = 0
+short.currentGoal.rating = 0
+short.currentGoal.goal = "mem_0"
 
-
---Send a state/result to the causes array.
+--Send a state/result to the causes array.  Effect isn't really talked about here.
 function short.updateCause(state, cause, effect)
 	--If we don't have existing data for the state.
 	if(causes[state] == nil) then
@@ -30,7 +33,7 @@ function short.updateCause(state, cause, effect)
 		--Just update it.  Don't worry about bayesian stuff.
 
 		--Extract out the actual number of successes.
-		causes[state][cause].effect = causes[state][cause].effect*causes[state][cause].trials;
+		causes[state][cause].chance = causes[state][cause].chance*causes[state][cause].trials;
 		
 		--If it's a positive result (or at least an expected one.)
 		if(effect == causes[state][cause].effect) then

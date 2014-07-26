@@ -2,6 +2,7 @@ local decider = {}
 
 
 function decider.pickKeys()
+	--vba.print(Piglet.Memory.Short.currentGoal.goal)
 	local keys = {}
 	local available = Piglet.Hardware.Hand.getAvailableKeys()
 
@@ -14,9 +15,9 @@ function decider.pickKeys()
 
 	--Decide which keys to press.
 	local checked = {} 
-	checked["mem_"..Piglet.Memory.Short.currentGoal.address] = 1
+	checked[Piglet.Memory.Short.currentGoal.goal] = 1
 	--if(input.get().tab == true) then
-		decider.maximizeGoal("mem_"..Piglet.Memory.Short.currentGoal.address, 1, keys, checked, 1)
+		decider.maximizeGoal(Piglet.Memory.Short.currentGoal.goal, 1, keys, checked, 1)
 	--end
 	Piglet.Hardware.Hand.setKeys(keys)
 end

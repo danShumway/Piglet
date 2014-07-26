@@ -2,8 +2,8 @@ local short = {}
 
 --Causes are used here with percentage values.
 local causes = {}
-
 local states = {}
+local watching = {}
 
 
 --Send a state/result to the causes array.

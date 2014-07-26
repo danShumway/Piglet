@@ -10,7 +10,7 @@ short.currentGoal.rating = 0
 short.currentGoal.goal = "mem_0"
 
 --Send a state/result to the causes array.  Effect isn't really talked about here.
-function short.updateCause(state, cause, effect)
+function short.updateCause(state, cause, direction)
 	--If we don't have existing data for the state.
 	if(causes[state] == nil) then
 		--Create the state
@@ -23,7 +23,7 @@ function short.updateCause(state, cause, effect)
 		causes[state][cause] = {}
 		--There are a couple of fields we care about making.
 		causes[state][cause].trials = 1
-		causes[state][cause].effect = effect
+		causes[state][cause].effect = 1
 
 		--If we really wanted to be mathematically accurate, we'd set this to 1.
 		--But I think that's not what we want to do right now.
@@ -35,11 +35,9 @@ function short.updateCause(state, cause, effect)
 		--Extract out the actual number of successes.
 		causes[state][cause].chance = causes[state][cause].chance*causes[state][cause].trials;
 		
-		--If it's a positive result (or at least an expected one.)
-		if(effect == causes[state][cause].effect) then
-			--Increase likelyhood.
-			causes[state][cause].chance = causes[state][cause].chance + 1
-		end
+		--Adjust likelyhood.
+		causes[state][cause].chance = causes[state][cause].chance + direction
+
 
 		--Increase number of trials
 		causes[state][cause].trials = causes[state][cause].trials + 1

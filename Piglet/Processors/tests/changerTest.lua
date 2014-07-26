@@ -40,21 +40,20 @@ function changerTest.reverse()
 	--Keys/States we've observed
 		--Are any of them currently true?  --Skip for now.
 			--What is being effected?
-			for k_2, v_2 in pairs(Piglet.Memory.Instant.currentChanges) do
+			for k_2, v_2 in pairs(Piglet.Memory.Instant.currentFrame) do
 				--Update depending on whether or not what we're watching is actually true.
 				if(Piglet.Processor.checkPastState(k) == 1) then
-					Piglet.Memory.Short.updateCause("mem_"..k_2, k, 1)
-					--Piglet.Memory.Short.updateCause("mem_"..k_2, k, 1)
-				else
-					--It changed without x.  Maybe x isn't completely necessary?
-					--Piglet.Memory.Short.updateCause("mem_"..k_2, k, 1) -- A way for us to get around a current restriction.
-					--Piglet.Memory.Short.updateCause("mem_"..k_2, k, -1)
-					--Piglet.Memory.Short.updateCause("mem_"..k_2, k, -1)
+					--if it was a change.
+					if(Piglet.Memory.Instant.currentChanges[k_2] ~= nil) then
+						Piglet.Memory.Short.updateCause("mem_"..k_2, k, 1)
+					else
+						Piglet.Memory.Short.updateCause("mem_"..k_2, k, -1)
+					end
 				end
 
 				if(k ~= 'default') then --Hard check
 					--If the cause is above 95% and it's not a member of watching, add it.
-					if(Piglet.Memory.Short.getCauses("mem_"..k_2)[k] ~= nil and Piglet.Memory.Short.getCauses("mem_"..k_2)[k].chance > .95 and Piglet.Memory.Short.watching["mem_"..k_2] == nil) then
+					if(Piglet.Memory.Short.getCauses("mem_"..k_2)[k] ~= nil and Piglet.Memory.Short.getCauses("mem_"..k_2)[k].chance > .85 and Piglet.Memory.Short.watching["mem_"..k_2] == nil) then
 						Piglet.Memory.Short.watching["mem_"..k_2] = 1
 						Piglet.Memory.Short.currentGoal = {goal="mem_"..k_2}
 						print('added state: '.."mem_"..k_2)

@@ -36,13 +36,19 @@ end
 function changerTest.reverse()
 
 	--Loop through all of the frames.
-	for k, v in pairs(Piglet.Memory.Instant.currentFrame) do
+	local curFrame = Piglet.Memory.Instant.currentFrame
+	local curChanges = Piglet.Memory.Instant.currentChanges
+	local watching = Piglet.Memory.Short.watching
+	local rand = math.random(55536)
+	--Pick a random 10,000 coord block.
+	for k=rand, 10000--[[65536]] do --Not sure how much these help, but some optimizations.
+		local v = curFrame[k]
 		--Observable states.
-		for k_2, v_2 in pairs(Piglet.Memory.Short.watching) do
+		for k_2, v_2 in pairs(watching) do
 			--Update depending on whether or not what that state is true.
 			if(Piglet.Processor.checkPastState(k_2) == 1) then
 				--if it was a change.
-				if(Piglet.Memory.Instant.currentChanges[k] ~= nil) then
+				if(curChanges[k] ~= nil) then
 					Piglet.Memory.Short.updateCause("mem_"..k, k_2, 1)
 				else
 					Piglet.Memory.Short.updateCause("mem_"..k, k_2, -1)
@@ -52,7 +58,7 @@ function changerTest.reverse()
 			if(k_2 ~= 'default') then --Hard check
 				--If the cause is above 95% and it's not a member of watching, add it.
 				if(Piglet.Memory.Short.getCauses("mem_"..k_2)[k] ~= nil and Piglet.Memory.Short.getCauses("mem_"..k_2)[k].chance > .85 and Piglet.Memory.Short.watching["mem_"..k_2] == nil) then
-					Piglet.Memory.Short.watching["mem_"..k_2] = 1
+					watching["mem_"..k_2] = 1
 					Piglet.Memory.Short.currentGoal = {goal="mem_"..k_2}
 					print('added state: '.."mem_"..k_2)
 				end
@@ -63,35 +69,35 @@ end
 
 
 
-function changerTest.reverse()
+-- function changerTest.reverse()
 
-	--Loop through every action we know we can do.
-	for k, v in pairs(Piglet.Memory.Short.watching) do
-	--Keys/States we've observed
-		--Are any of them currently true?  --Skip for now.
-			--What is being effected?
-			for k_2, v_2 in pairs(Piglet.Memory.Instant.currentFrame) do
-				--Update depending on whether or not what we're watching is actually true.
-				if(Piglet.Processor.checkPastState(k) == 1) then
-					--if it was a change.
-					if(Piglet.Memory.Instant.currentChanges[k_2] ~= nil) then
-						Piglet.Memory.Short.updateCause("mem_"..k_2, k, 1)
-					else
-						Piglet.Memory.Short.updateCause("mem_"..k_2, k, -1)
-					end
-				end
+-- 	--Loop through every action we know we can do.
+-- 	for k, v in pairs(Piglet.Memory.Short.watching) do
+-- 	--Keys/States we've observed
+-- 		--Are any of them currently true?  --Skip for now.
+-- 			--What is being effected?
+-- 			for k_2, v_2 in pairs(Piglet.Memory.Instant.currentFrame) do
+-- 				--Update depending on whether or not what we're watching is actually true.
+-- 				if(Piglet.Processor.checkPastState(k) == 1) then
+-- 					--if it was a change.
+-- 					if(Piglet.Memory.Instant.currentChanges[k_2] ~= nil) then
+-- 						Piglet.Memory.Short.updateCause("mem_"..k_2, k, 1)
+-- 					else
+-- 						Piglet.Memory.Short.updateCause("mem_"..k_2, k, -1)
+-- 					end
+-- 				end
 
-				if(k ~= 'default') then --Hard check
-					--If the cause is above 95% and it's not a member of watching, add it.
-					if(Piglet.Memory.Short.getCauses("mem_"..k_2)[k] ~= nil and Piglet.Memory.Short.getCauses("mem_"..k_2)[k].chance > .85 and Piglet.Memory.Short.watching["mem_"..k_2] == nil) then
-						Piglet.Memory.Short.watching["mem_"..k_2] = 1
-						Piglet.Memory.Short.currentGoal = {goal="mem_"..k_2}
-						print('added state: '.."mem_"..k_2)
-					end
-				end
-			end
-	end
-end
+-- 				if(k ~= 'default') then --Hard check
+-- 					--If the cause is above 95% and it's not a member of watching, add it.
+-- 					if(Piglet.Memory.Short.getCauses("mem_"..k_2)[k] ~= nil and Piglet.Memory.Short.getCauses("mem_"..k_2)[k].chance > .85 and Piglet.Memory.Short.watching["mem_"..k_2] == nil) then
+-- 						Piglet.Memory.Short.watching["mem_"..k_2] = 1
+-- 						Piglet.Memory.Short.currentGoal = {goal="mem_"..k_2}
+-- 						print('added state: '.."mem_"..k_2)
+-- 					end
+-- 				end
+-- 			end
+-- 	end
+-- end
 
 
 return changerTest

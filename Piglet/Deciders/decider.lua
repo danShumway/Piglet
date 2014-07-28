@@ -8,7 +8,7 @@ function decider.pickKeys()
 
 	--For right now, I'll just choose input at random.
 	for k, v in pairs(available) do
-		if math.random() < .05 then
+		if math.random() < .2 then
 			keys[v] = 1
 		end
 	end
@@ -17,7 +17,7 @@ function decider.pickKeys()
 	local checked = {} 
 	checked[Piglet.Memory.Short.currentGoal.goal] = 1
 	--if(input.get().tab == true) then
-		decider.maximizeGoal(Piglet.Memory.Short.currentGoal.goal, 1, keys, checked, 1)
+		--decider.maximizeGoal(Piglet.Memory.Short.currentGoal.goal, 1, keys, checked, 1)
 	--end
 	Piglet.Hardware.Hand.setKeys(keys)
 end

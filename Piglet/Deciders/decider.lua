@@ -22,6 +22,12 @@ function decider.pickKeys()
 	Piglet.Hardware.Hand.setKeys(keys)
 end
 
+
+
+function decider.getCombosForGoal()
+
+end
+
 function decider.maximizeGoal(goal, direction, keys, checked, tick)
 	--Translate a goal into an array.
 	if(tick < 5) then
@@ -56,19 +62,6 @@ function decider.maximizeGoal(goal, direction, keys, checked, tick)
 	    	end
 	    end
     end
-    --
-
-	--Start at our goal and loop through all of the states.
-
-	--Are any negative states true?
-			--If so, how do we change them?
-	--Otherwise, ignore them.
-
-	--Any positive states not true?
-			--If so, how do we change them?
-	--Otherwise, ignore them. (?)
-
-
 end
 
 return decider

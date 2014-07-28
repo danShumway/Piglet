@@ -9,6 +9,7 @@ function processor.process()
 	Piglet.Memory.Short.forgetStates()
 
 	test.reverse()
+	Piglet.Memory.Long.save("Mario_6Golden_Coins", "test_01", Piglet.Memory.Short.allCauses())
 	--processor.pickGoal()
 
 	--print(Piglet.Memory.Short.currentGoal.address)

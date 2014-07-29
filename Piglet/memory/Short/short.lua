@@ -61,6 +61,10 @@ function short.allCauses()
 	return causes
 end
 
+function short.rememberCauses(_c)
+	causes = _c
+end
+
 --Returns whether or not a state is true.
 --Returns 1 (true), 0(false), or -1, unknown.
 function short.getState(state)

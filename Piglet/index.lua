@@ -95,6 +95,8 @@ end
 
 
 --main
+--Remember some stuff.
+Piglet.Memory.Short.rememberCauses(Piglet.Memory.Long.load("Mario_6Golden_Coins", "test_01"))
 while(true) do
 	--Piglet sees.
 	--Eye

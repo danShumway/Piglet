@@ -39,65 +39,66 @@ function changerTest.reverse()
 	local curFrame = Piglet.Memory.Instant.currentFrame
 	local curChanges = Piglet.Memory.Instant.currentChanges
 	local watching = Piglet.Memory.Short.watching
-	local rand = math.random(55536)
+	--local rand = math.random(55536)
 	--Pick a random 10,000 coord block.
-	for k=rand, 10000--[[65536]] do --Not sure how much these help, but some optimizations.
+	--for k=rand, rand+10000--[[65536]] do --Not sure how much these help, but some optimizations.
+	for k=1, 65536 do
 		local v = curFrame[k]
 		--Observable states.
-		for k_2, v_2 in pairs(watching) do
-			--Update depending on whether or not what that state is true.
-			if(Piglet.Processor.checkPastState(k_2) == 1) then
-				--if it was a change.
-				if(curChanges[k] ~= nil) then
-					Piglet.Memory.Short.updateCause("mem_"..k, k_2, 1)
-				else
-					Piglet.Memory.Short.updateCause("mem_"..k, k_2, -1)
-				end
-			end
 
-			if(k_2 ~= 'default') then --Hard check
-				--If the cause is above 95% and it's not a member of watching, add it.
-				if(Piglet.Memory.Short.getCauses("mem_"..k_2)[k] ~= nil and Piglet.Memory.Short.getCauses("mem_"..k_2)[k].chance > .85 and Piglet.Memory.Short.watching["mem_"..k_2] == nil) then
-					watching["mem_"..k_2] = 1
-					Piglet.Memory.Short.currentGoal = {goal="mem_"..k_2}
-					print('added state: '.."mem_"..k_2)
+		--First we loop through and see which states are true/false.
+		local causes = Piglet.Memory.Short.getCauses("mem_"..k)
+		local frameChanged = false
+		if(Piglet.Memory.Instant.currentChanges[k] ~= nil) then --Did the frame we're on change?
+			frameChanged = true
+		else
+			frameChanged = false
+		end
+		local changeLikelyhood = 0 --The likelyhood that this effect will happen.
+		local i = 0 --How many causes we've run.
+		for k_2, v_2 in pairs(causes) do
+			--Is it true?
+			if(Piglet.Processor.checkPastState(k_2) == 1) then
+				i = i+1 --Look, a possible cause.
+				changeLikelyhood = changeLikelyhood + v_2.chance --Add likelyhood.
+			end
+		end
+
+		--We don't get final likelyhood of change here, because it varies depending on what we're testing.
+
+		--Loop through and update the states we're wathing.
+		--print("c: "..)
+		for k_2, v_2 in pairs(watching) do
+			local myLikelyhood = changeLikelyhood
+			local j = i
+			--Is it currently true?
+			if(Piglet.Processor.checkPastState(k_2) == 1) then
+				--Does it exist?
+				if(causes[k_2] ~= nil) then
+					--Don't count your own probability against you.
+					myLikelyhood = myLikelyhood - causes[k_2].chance
+					j = j - 1
+				end
+
+				--Now, get final likelyhood and subtract.
+				if(j ~= 0) then
+					--myLikelyhood = myLikelyhood / j
+				end
+
+				--Depending on if the frame changed, we move in one of two directions.
+				if(frameChanged == true) then
+					-- We adjust by 1 - changeLikelyhood
+					Piglet.Memory.Short.updateCause("mem_"..k, k_2, math.max(1 - myLikelyhood, 0))
+
+				else
+					--We adjust by -1 - changeLikelyhood
+					Piglet.Memory.Short.updateCause("mem_"..k, k_2, math.min(0 - myLikelyhood, 0))
+					
 				end
 			end
 		end
 	end
 end
-
-
-
--- function changerTest.reverse()
-
--- 	--Loop through every action we know we can do.
--- 	for k, v in pairs(Piglet.Memory.Short.watching) do
--- 	--Keys/States we've observed
--- 		--Are any of them currently true?  --Skip for now.
--- 			--What is being effected?
--- 			for k_2, v_2 in pairs(Piglet.Memory.Instant.currentFrame) do
--- 				--Update depending on whether or not what we're watching is actually true.
--- 				if(Piglet.Processor.checkPastState(k) == 1) then
--- 					--if it was a change.
--- 					if(Piglet.Memory.Instant.currentChanges[k_2] ~= nil) then
--- 						Piglet.Memory.Short.updateCause("mem_"..k_2, k, 1)
--- 					else
--- 						Piglet.Memory.Short.updateCause("mem_"..k_2, k, -1)
--- 					end
--- 				end
-
--- 				if(k ~= 'default') then --Hard check
--- 					--If the cause is above 95% and it's not a member of watching, add it.
--- 					if(Piglet.Memory.Short.getCauses("mem_"..k_2)[k] ~= nil and Piglet.Memory.Short.getCauses("mem_"..k_2)[k].chance > .85 and Piglet.Memory.Short.watching["mem_"..k_2] == nil) then
--- 						Piglet.Memory.Short.watching["mem_"..k_2] = 1
--- 						Piglet.Memory.Short.currentGoal = {goal="mem_"..k_2}
--- 						print('added state: '.."mem_"..k_2)
--- 					end
--- 				end
--- 			end
--- 	end
--- end
 
 
 return changerTest

@@ -1,0 +1,151 @@
+<html>
+
+<head>
+	<title>Memory Frequency Visualizer</title>
+	<script type="text/javascript" src="libraries/jquery-2.1.1.min.js"></script>
+	<script type="text/javascript" src="Data/total.js"></script>
+
+	<script>
+		 $(document).ready(function(e) {
+		 	var style = "both"
+		 	var canvas, ctx;
+		 	var posX = 0;
+		 	var scale = .5;
+		 	var mousedown = {"down":false, "position":0}
+
+		 	var toDraw = {
+		 		"key_left" : {"color": "#00ff00", "active":true},
+		 		"key_right" : {"color": "#00ff00", "active":true},
+		 		"default" : {"color": "#fff000", "active":true},
+		 		"key_A" : {"color": "#0001ff", "active":true},
+		 		"key_B" : {"color": "#0001ff", "active":true}
+		 	}
+
+
+		 	console.log('split string');
+		 	//Parse the data.
+		 	var splitString = data.split(':');
+
+		 	console.log('parse data');
+			var total = {};
+			var currentKey = undefined; //Do we have a key?
+			var currentObject = {"object":{}, "parent":undefined }; //What object are we on?
+			
+			for(var i=0; i<splitString.length; i++) {
+				var item = splitString[i];
+			    //If you're closing an object, then do that.
+			    if(item == "]") {
+			     	currentObject = currentObject.parent;
+			    //If we don't have a key, you're on that.
+			    } else if(currentKey == undefined) {
+			      	currentKey = item;
+				//If we do have a key, then you're looking for a value.
+				//Of course, that value might be an object.
+				} else if(item == "[") {
+					currentObject.object[currentKey] = {};
+					currentObject = {"object":currentObject.object[currentKey], "parent":currentObject };
+					currentKey = undefined; //Reset key.
+				//Nvm, it's got to be a value.
+				} else {
+					currentObject.object[currentKey] = item;
+					currentKey = undefined; //Reset key.
+				}
+		    }
+
+			total = currentObject["object"].object;
+			console.log("finished, drawing");
+
+			//Get what we need to draw.
+		 	/*for (var c in total.object) {
+		 		if(toDraw[c] == undefined) {
+
+		 			toDraw[c] = {"color": '#'+Math.floor(Math.random()*16777215).toString(16), "active":true};
+		 		}
+		 	}*/
+
+		 	for (var c in toDraw) {
+		 		var checkbox = document.createElement('input');
+		 		checkbox.type = 'checkbox';
+		 		checkbox.name = c;
+		 		checkbox.value = true;
+		 		checkbox.id = c;
+		 		checkbox.checked = true;
+		 		checkbox.onclick = function(e){ draw(posX) }
+
+		 		var label = document.createElement('label')
+		 		label.htmlFor = c;
+		 		label.appendChild(document.createTextNode(c));
+
+		 		var appendTo = document.getElementById('checkboxes')
+		 		appendTo.appendChild(checkbox);
+		 		appendTo.appendChild(label);
+		 	}
+
+
+		 	canvas = document.getElementById("visualizer");
+		 	ctx = canvas.getContext("2d");
+		 	//for(i=0; i < /*256*16*16*/; i++){
+
+		 	draw(posX);
+
+		 	canvas.onmousemove = function(e){
+		 		if(mousedown.down){
+			 		posX = Math.floor((e.pageX)/1920 * (256*16*16));
+			 		draw(posX);
+			 	}
+		 	}
+
+		 	canvas.onmousedown = function(e){
+		 		mousedown.down = true;
+		 		mousedown.position = e.pageX
+		 		canvas.onmousemove(e);
+		 	}
+		 	canvas.onmouseup = function(e){
+		 		mousedown.down = false;
+		 	}
+
+
+
+		 	function draw(posX){
+		 		ctx.clearRect(0,0,1920,800)
+		 		ctx.fillStyle = "#888888"
+		 		ctx.fillRect(0,0,1920, 800)
+			 	var n = 0;
+			 	//for (var i in left) {
+			 	for(i = posX; i < posX + 1920/scale; i++){
+			 		//if(total[i] != undefined){
+			 			/*ctx.fillStyle="#000000";
+			 			ctx.fillRect(n, 500, 1, left[i]["default"]);
+			 			ctx.fillStyle="#FF0000";
+			 			ctx.fillRect(n, 500, 1, left[i].left)*/
+			 			/*for(var c in toDraw) {
+			 				console.log('drawing current position');
+			 				if(document.getElementById(c).checked){
+				 				ctx.fillStyle = toDraw[c].color;
+				 				ctx.fillRect((i-posX)*scale, 400, scale, 100*total[i][c].chance);
+				 			}
+			 			}*/
+			 			for(var c in toDraw) {
+			 				if(document.getElementById(c).checked){
+				 				ctx.fillStyle = toDraw[c].color;
+				 				if(total["mem_"+i] != undefined && total["mem_" + i][c] != undefined){
+				 					ctx.fillRect((i-posX)*scale, 400, scale, -300*total["mem_"+i][c].chance);
+				 				}
+				 			}
+			 			}
+
+			 		//}
+			 	}
+			 	console.log('done drawing');
+			 }
+		});
+	</script>
+</head>
+
+<body>
+	<canvas id="visualizer" width="1920px", height="800px"></canvas>
+	<div id="checkboxes"></div>
+</body>
+
+
+</html>

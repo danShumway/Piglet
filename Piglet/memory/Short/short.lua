@@ -25,9 +25,8 @@ function short.updateCause(state, cause, direction)
 		causes[state][cause].trials = 1
 		causes[state][cause].effect = 1
 
-		--If we really wanted to be mathematically accurate, we'd set this to 1.
-		--But I think that's not what we want to do right now.
-		causes[state][cause].chance = .5
+		--Start it at the proper chance.
+		causes[state][cause].chance = direction
 	else
 		--We keep things simple for right now.
 		--Just update it.  Don't worry about bayesian stuff.

@@ -36,6 +36,7 @@ and stores that in instant memory as well.
 Piglet.Memory = {}
 Piglet.Memory.Instant = dofile('memory/Instant/instant.lua')
 Piglet.Memory.Short = dofile('memory/Short/short.lua')
+Piglet.Memory.Long = dofile('memory/Long/long.lua')
 
 --We don't have an accessible long.  What long should be is a class that pulls data and puts it into short.
 
@@ -94,6 +95,8 @@ end
 
 
 --main
+--Remember some stuff.
+Piglet.Memory.Short.rememberCauses(Piglet.Memory.Long.load("Mario_6Golden_Coins", "test_01"))
 while(true) do
 	--Piglet sees.
 	--Eye

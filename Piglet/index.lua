@@ -98,7 +98,7 @@ end
 --Remember some stuff.
 --Piglet.Memory.Short.rememberCauses(Piglet.Memory.Long.load("Mario_6Golden_Coins", "test_01"))
 --Should probably move this.
-Piglet.Memory.Short.strategies.init(4, 2)
+Piglet.Memory.Short.strategies.init(4, 4)
 while(true) do
 	--Piglet sees.
 	--Eye

@@ -18,6 +18,7 @@ function processor.process()
 
 	--print(Piglet.Memory.Short.currentGoal.address)
 	--print(Piglet.Memory.Short.currentGoa)
+	test.iterate()
 
 end
 

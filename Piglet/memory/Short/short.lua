@@ -49,31 +49,39 @@ function short.strategies.keyNode(step_keys, node_prev, node_next)
 	--Handle mutation.
 	function node.mutate()
 
-		if math.random() < .2 then
+		if math.random() < .07 then
 			--Get some random keys.
 			local random_keys = {}
 			local available = Piglet.Hardware.Hand.getAvailableKeys()
 			for k, v in pairs(available) do
 				if math.random() < .2 then
-					keys[v] = 1
+					random_keys[v] = 1
 				end
 			end
 
 			--Choose where to attach them.
 			local r = math.random()
-			--We divide by 2 for these because each node has a chance to duplicate.
-			--So to keep it truly even, we need to make each node more likely to modify itself.
-			--I might change this later.
-			if r < .666 then --Adjust current node.
+			if r < .333 then --Adjust current node.
 				keys = random_keys
-			elseif r < .832 then --Insert a previous node.
+				print('mutated new combo')
+			elseif r < .499 then --Insert a previous node.
 				local new_node = short.strategies.keyNode(random_keys, prev, node)
 				if prev ~= nil then prev.updateNext(new_node) end
+				print('mutated new step')
 				prev = new_node
-			else --Insert a next node.
+			elseif r < .666 then --Insert a next node.
+				print('mutated new step')
 				local new_node = short.strategies.keyNode(random_keys, node, next)
 				if next ~= nil then next.updatePrev(new_node) end
 				next = new_node
+			elseif r < .832 then --Delete a previous node.
+				if prev ~= nil then 
+					--Finish this soon.
+				end
+			else --Delete a next node.
+				if next ~= nil then
+					--Finish this soon.
+				end
 			end
 		end
 	end
@@ -121,6 +129,7 @@ function short.strategies.init(length, chances)
 
 	--Used to figure out where we are in the short.strategies.
 	short.strategies.currentIndex = 1
+	short.strategies.chances = chances
 	short.strategies.chancesLeft = chances
 	short.strategies.currentNode = short.strategies[1].strategy
 end
@@ -130,6 +139,10 @@ function short.strategies.iterate(strategy)
 		short.strategies[i] = {score=0, strategy=strategy.duplicate(true) }
 	end
 
+	--Used to figure out where we are in the short.strategies.
+	short.strategies.currentIndex = 1
+	short.strategies.chancesLeft = short.strategies.chances
+	short.strategies.currentNode = short.strategies[1].strategy
 end
 
 ----------------------------------------------------------------------

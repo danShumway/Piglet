@@ -26,8 +26,6 @@ function decider.pickKeys()
 			Piglet.Memory.Short.strategies.chancesLeft = Piglet.Memory.Short.strategies.chancesLeft - 1
 			--Oh yeah, we need a new node for next turn.
 			Piglet.Memory.Short.strategies.currentNode = Piglet.Memory.Short.strategies[1].strategy
-			Piglet.Memory.Short.strategies.iterate(Piglet.Memory.Short.strategies.currentNode)
-
 		end
 	else
 		Piglet.Memory.Short.strategies.currentNode = currentStep.nextNode

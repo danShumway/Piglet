@@ -22,7 +22,7 @@ function observer.observe()
 	for a=1, 256*16*16 do
 		if(Piglet.Memory.Instant.lastFrame[a] ~= Piglet.Memory.Instant.currentFrame[a]) then
 			--Record changes that are relevant.
-			Piglet.Memory.Instant.currentChanges[a] = Piglet.Memory.Instant.currentFrame[a] - Piglet.Memory.Instant.lastFrame[a]
+			Piglet.Memory.Instant.currentChanges[a] = Piglet.Memory.Instant.currentFrame[a] --- Piglet.Memory.Instant.lastFrame[a]
 		else
 			--Set as nil.  This will make other loops more efficient if we use for... in.
 			Piglet.Memory.Instant.currentChanges[a] = nil

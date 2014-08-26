@@ -63,14 +63,14 @@ function short.strategies.keyNode(step_keys, node_prev, node_next)
 			local r = math.random()
 			if r < .333 then --Adjust current node.
 				keys = random_keys
-				print('mutated new combo')
+				--print('mutated new combo')
 			elseif r < .499 then --Insert a previous node.
 				local new_node = short.strategies.keyNode(random_keys, prev, node)
 				if prev ~= nil then prev.updateNext(new_node) end
-				print('mutated new step')
+				--print('mutated new step')
 				prev = new_node
 			elseif r < .666 then --Insert a next node.
-				print('mutated new step')
+				--print('mutated new step')
 				local new_node = short.strategies.keyNode(random_keys, node, next)
 				if next ~= nil then next.updatePrev(new_node) end
 				next = new_node
@@ -110,6 +110,15 @@ function short.strategies.keyNode(step_keys, node_prev, node_next)
 		return toReturn
 	end
 
+	function node.toString(i)
+		local toReturn = i..":"
+		for k,v in pairs(keys) do
+			toReturn = toReturn..k
+		end
+		if(next ~= nil) then toReturn = toReturn..", "..next.toString(i+1) end
+		return toReturn
+	end
+
 	return node
 end
 
@@ -123,25 +132,22 @@ function short.strategies.init(length, chances)
 	short.strategies.count = length --
 	short.strategies.baseChances = chances
 	for i=1, length, 1 do
-		short.strategies[i] = {score=0, strategy=short.strategies.keyNode({}, nil, nil) }
+		short.strategies[i] = {score=0, chancesLeft=short.strategies.baseChances, strategy=short.strategies.keyNode({}, nil, nil) }
 	end
 
 
 	--Used to figure out where we are in the short.strategies.
 	short.strategies.currentIndex = 1
-	short.strategies.chances = chances
-	short.strategies.chancesLeft = chances
 	short.strategies.currentNode = short.strategies[1].strategy
 end
 
 function short.strategies.iterate(strategy)
 	for i=1, short.strategies.count, 1 do
-		short.strategies[i] = {score=0, strategy=strategy.duplicate(true) }
+		short.strategies[i] = {score=0, chancesLeft=short.strategies.baseChances, strategy=strategy.duplicate(true) }
 	end
 
 	--Used to figure out where we are in the short.strategies.
 	short.strategies.currentIndex = 1
-	short.strategies.chancesLeft = short.strategies.chances
 	short.strategies.currentNode = short.strategies[1].strategy
 end
 

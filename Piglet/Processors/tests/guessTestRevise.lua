@@ -18,8 +18,10 @@ function guessTestRevise.iterate()
 	end
 
 	--If we've reached the end, iterate on the winning formula.
-	if(Piglet.Memory.Short.strategies.chancesLeft <= 0) then
+	if(Piglet.Memory.Short.strategies.refresh == true) then
 
+		Piglet.Memory.Short.strategies.refresh = false --We're doing it.
+		
 		local bestStrategy = 1
 		local bestScore = 0
 		--Find winner
@@ -30,7 +32,7 @@ function guessTestRevise.iterate()
 			end
 		end
 		Piglet.Memory.Short.strategies.iterate(Piglet.Memory.Short.strategies[bestStrategy].strategy)
-		--print(bestScore)
+		print("trial finished: "..bestScore..", "..Piglet.Memory.Short.strategies.currentNode.toString(0))
 	end
 end
 

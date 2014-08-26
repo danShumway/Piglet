@@ -1,23 +1,19 @@
 local guessTestRevise = {}
 
------------------------------------------------------
---Data structures------------------------------------
------------------------------------------------------
-
---We need to have that whole data structure for saving and breeding sequences.
 
 --
 function guessTestRevise.iterate(sequence)
 
-	--I'm wondering how much it violates the short memory principle to have stuff here.
-	--I kind of think it does.
-
+	--For each step.
+	for k, v in pairs(Piglet.Memory.Instant.currentChanges) do
+		if(Piglet.Memory.Short.updateSeen(k, v)) then
+			--You get a huge bonus.
+		else
+			--Repetitive changes either shouldn't count towards you, or should count as nothing.
+			--Since we'll be able to see how many times you've seen that, we could possibly bias stuff(?)
+			--Not really useful, I think we thought through a couple of reasons that doesn't work.
+		end
+	end
 end
-
---[[
-So what happens with this?  Do I store this data here?  I don't think so.  I would rather have a data structure in short.dataStructure.
-
-]]
-
 
 return guessTestRevise

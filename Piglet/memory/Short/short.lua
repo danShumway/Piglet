@@ -19,13 +19,13 @@ short.currentGoal.goal = "mem_0"
 local seen = {}
 
 ----------------------------------------------------------------------
---Data structure for strategies.
+--Data structure for short.strategies.
 ----------------------------------------------------------------------
-local strategies = {}
+short.strategies = {}
 
 --Generates a new node for use in a strategy
 --Add what keys you want pressed, and the nodes that you want to be inserted in.
-function strategies.keyNode(step_keys, node_prev, node_next)
+function short.strategies.keyNode(step_keys, node_prev, node_next)
 	local node = {}
 	local keys = step_keys
 
@@ -43,7 +43,7 @@ function strategies.keyNode(step_keys, node_prev, node_next)
 	--Returns both the keys that you're supposed to press
 	--And a link to the next node to check (or nil if you're at the end of the )
 	function node.getKeys()
-		return {keys=keys, next_node=next}
+		return {toPress=keys, nextNode=next}
 	end
 
 	--Handle mutation.
@@ -67,12 +67,12 @@ function strategies.keyNode(step_keys, node_prev, node_next)
 			if r < .666 then --Adjust current node.
 				keys = random_keys
 			elseif r < .832 then --Insert a previous node.
-				local new_node = strategies.keyNode(random_keys, prev, node)
-				prev.updateNext(new_node)
+				local new_node = short.strategies.keyNode(random_keys, prev, node)
+				if prev ~= nil then prev.updateNext(new_node) end
 				prev = new_node
 			else --Insert a next node.
-				local new_node = strategies.keyNode(random_keys, node, next)
-				next.updatePrev(new_node)
+				local new_node = short.strategies.keyNode(random_keys, node, next)
+				if next ~= nil then next.updatePrev(new_node) end
 				next = new_node
 			end
 		end
@@ -86,7 +86,7 @@ function strategies.keyNode(step_keys, node_prev, node_next)
 			duplicated_next = next.duplicate(do_mutation)
 		end
 
-		local toReturn = strategies.keyNode(keys, nil, duplicated_next) --Replace current node.
+		local toReturn = short.strategies.keyNode(keys, nil, duplicated_next) --Replace current node.
 
 		--Having a second if here is inneficient, todo: take a look at fixing it.
 		if next ~= nil then
@@ -106,21 +106,34 @@ function strategies.keyNode(step_keys, node_prev, node_next)
 end
 
 --Not filled out right now, but will be.
-function strategies.choiceNode()
+function short.strategies.choiceNode()
 
 end
 
---Length: how many strategies
-function strategies.init(length, chances)
-	strategies.length = length --
-	strategies.baseChances = chances
-	for i=1, length + 1, 1 do
-		strategies[i] = {score=0, strategy=strategies.keyNode({A=1}, nil, nil) }
+--Length: how many short.strategies.  **Must** be at least 1.
+function short.strategies.init(length, chances)
+	short.strategies.count = length --
+	short.strategies.baseChances = chances
+	for i=1, length, 1 do
+		short.strategies[i] = {score=0, strategy=short.strategies.keyNode({}, nil, nil) }
 	end
+
+
+	--Used to figure out where we are in the short.strategies.
+	short.strategies.currentIndex = 1
+	short.strategies.chancesLeft = chances
+	short.strategies.currentNode = short.strategies[1].strategy
+end
+
+function short.strategies.iterate(strategy)
+	for i=1, short.strategies.count, 1 do
+		short.strategies[i] = {score=0, strategy=strategy.duplicate(true) }
+	end
+
 end
 
 ----------------------------------------------------------------------
---end data structure for strategies.
+--end data structure for short.strategies.
 ----------------------------------------------------------------------
 
 
@@ -152,6 +165,8 @@ function short.updateSeen(state, value)
 		return seen[state][value] - 1
 	end
 end
+
+
 
 
 -------------------------------------------------------------------------------------------------------

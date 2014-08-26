@@ -14,8 +14,8 @@ function decider.pickKeys()
 	end
 
 	--Decide which keys to press.
-	local checked = {} 
-	checked[Piglet.Memory.Short.currentGoal.goal] = 1
+	--local checked = {} 
+	--checked[Piglet.Memory.Short.currentGoal.goal] = 1
 	--if(input.get().tab == true) then
 		--decider.maximizeGoal(Piglet.Memory.Short.currentGoal.goal, 1, keys, checked, 1)
 	--end

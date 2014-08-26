@@ -9,6 +9,155 @@ short.currentGoal.address = 0
 short.currentGoal.rating = 0
 short.currentGoal.goal = "mem_0"
 
+
+------------------------------------------------------------------------------------------------------
+-------------------------SIGNIFICANT CHANGES----------------------------------------------------------
+--Keeps track of all of the states that have been seen, and the number of times they have been seen.
+--
+------------------------------------------------------------------------------------------------------
+
+local seen = {}
+
+----------------------------------------------------------------------
+--Data structure for strategies.
+----------------------------------------------------------------------
+local strategies = {}
+
+--Generates a new node for use in a strategy
+--Add what keys you want pressed, and the nodes that you want to be inserted in.
+function strategies.keyNode(step_keys, node_prev, node_next)
+	local node = {}
+	local keys = step_keys
+
+	--For attaching and internal use.
+	local prev = node_prev
+	local next = node_next
+	--Updating position.
+	function node.updateNext(new_node)
+		next = new_node
+	end
+	function node.updatePrev(new_node)
+		prev = new_node
+	end
+
+	--Returns both the keys that you're supposed to press
+	--And a link to the next node to check (or nil if you're at the end of the )
+	function node.getKeys()
+		return {keys=keys, next_node=next}
+	end
+
+	--Handle mutation.
+	function node.mutate()
+
+		if math.random() < .2 then
+			--Get some random keys.
+			local random_keys = {}
+			local available = Piglet.Hardware.Hand.getAvailableKeys()
+			for k, v in pairs(available) do
+				if math.random() < .2 then
+					keys[v] = 1
+				end
+			end
+
+			--Choose where to attach them.
+			local r = math.random()
+			--We divide by 2 for these because each node has a chance to duplicate.
+			--So to keep it truly even, we need to make each node more likely to modify itself.
+			--I might change this later.
+			if r < .666 then --Adjust current node.
+				keys = random_keys
+			elseif r < .832 then --Insert a previous node.
+				local new_node = strategies.keyNode(random_keys, prev, node)
+				prev.updateNext(new_node)
+				prev = new_node
+			else --Insert a next node.
+				local new_node = strategies.keyNode(random_keys, node, next)
+				next.updatePrev(new_node)
+				next = new_node
+			end
+		end
+	end
+
+	--Returns a new strategy, optionally do mutations as well.
+	function node.duplicate(do_mutation)
+		--If you're not at the end of the sequence.
+		local duplicated_next = nil
+		if next ~= nil then
+			duplicated_next = next.duplicate(do_mutation)
+		end
+
+		local toReturn = strategies.keyNode(keys, nil, duplicated_next) --Replace current node.
+
+		--Having a second if here is inneficient, todo: take a look at fixing it.
+		if next ~= nil then
+			duplicated_next.updatePrev(duplicated_next) --Fix current node.
+		end
+
+		--If you're meant to mutate.
+		if do_mutation then
+			toReturn.mutate()
+		end
+
+		--Give back the head (or if recursive the currently generated node).
+		return toReturn
+	end
+
+	return node
+end
+
+--Not filled out right now, but will be.
+function strategies.choiceNode()
+
+end
+
+--Length: how many strategies
+function strategies.init(length, chances)
+	strategies.length = length --
+	strategies.baseChances = chances
+	for i=1, length + 1, 1 do
+		strategies[i] = {score=0, strategy=strategies.keyNode({A=1}, nil, nil) }
+	end
+end
+
+----------------------------------------------------------------------
+--end data structure for strategies.
+----------------------------------------------------------------------
+
+
+--Returns the number of times I've seen this state.
+function short.haveSeen(state, value)
+	--If I've seen this state change.
+	if(seen[state]) then
+		if(seen[state][value]) then
+			return seen[state][value]
+		end
+	end
+
+	return 0
+end
+
+--Adds a new state to the list of things you've seen.
+--Also returns the number of time's I've seen this state.
+function short.updateSeen(state, value)
+	--Set up state if it doesn't yet exist.
+	if(seen[state] == nil) then
+		seen[state] = {}
+	end
+	--Set up seen state if it doesn't exist yet.
+	if(seen[state][value] == nil) then
+		seen[state][value] = 1 --I've seen it once.
+		return 0
+	else
+		seen[state][value] = seen[state][value] + 1 --I've seen it again.
+		return seen[state][value] - 1
+	end
+end
+
+
+-------------------------------------------------------------------------------------------------------
+--------------------------CAUSE AND EFFECT-------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
+
 --Send a state/result to the causes array.  Effect isn't really talked about here.
 function short.updateCause(state, cause, direction)
 	--If we don't have existing data for the state.
@@ -27,7 +176,7 @@ function short.updateCause(state, cause, direction)
 
 		--Start it at the proper chance.
 		causes[state][cause].chance = direction
-	else
+	else 
 		--We keep things simple for right now.
 		--Just update it.  Don't worry about bayesian stuff.
 

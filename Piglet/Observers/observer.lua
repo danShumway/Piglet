@@ -8,6 +8,13 @@ function observer.observe()
 	Piglet.Memory.Instant.lastFrame = Piglet.Memory.Instant.currentFrame
 	Piglet.Memory.Instant.currentFrame = Piglet.Hardware.Eye.getFrame()
 
+	--Count what frame we're on/how many frames have elapsed during this current session.
+	if(Piglet.Memory.Instant.frameNumber == nil ) then 
+		Piglet.Memory.Instant.frameNumber = 1
+	else
+		Piglet.Memory.Instant.frameNumber = Piglet.Memory.Instant.frameNumber + 1
+	end
+
 	--Move back changes.
 	Piglet.Memory.Instant.lastChanges = Piglet.Memory.Instant.currentChanges
 	Piglet.Memory.Instant.currentChanges = {}
@@ -22,6 +29,8 @@ function observer.observe()
 		end
 	end
 end
+
+
 
 
 return observer

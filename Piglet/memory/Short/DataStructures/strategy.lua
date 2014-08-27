@@ -26,10 +26,20 @@ function strategies.keyNode(step_keys, node_prev, node_next)
 		return {toPress=keys, nextNode=next}
 	end
 
+	function node.delete()
+		if prev ~= nil then
+			prev.updateNext(next)
+		end
+		if next ~= nil then
+			next.updatePrev(prev)
+		end
+	end
+
 	--Handle mutation.
+	--Recursively via first node.
 	function node.mutate()
 
-		if math.random() < .07 then
+		if math.random() < .05 then
 			--Get some random keys.
 			local random_keys = {}
 			local available = Piglet.Hardware.Hand.getAvailableKeys()
@@ -40,7 +50,7 @@ function strategies.keyNode(step_keys, node_prev, node_next)
 			end
 
 			--Choose where to attach them.
-			local r = math.random(5)
+			local r = math.random(1, 6)
 
 
 
@@ -59,49 +69,49 @@ function strategies.keyNode(step_keys, node_prev, node_next)
 
 			elseif r == 4 then --Delete a previous node.
 				if prev ~= nil then 
-					--Finish this soon.
+					prev.delete()
 				end
 
-			else --Delete a next node.
-				if r == 5 then
-					--Finish this soon.
+			elseif r == 5 then --Delete next node.
+				if(next ~= nil) then
+					next.delete()
 				end
 			end
+		end
+
+
+		--Move on to the next node.
+		if(next ~= nil) then
+			next.mutate()
 		end
 	end
 
 	--Returns a new strategy, optionally do mutations as well.
-	function node.duplicate(do_mutation)
+	function node.duplicate()
 		--If you're not at the end of the sequence.
 		local duplicated_next = nil
 		local count = 1
 		if next ~= nil then
 			duplicated_next = next.duplicate(do_mutation)
-			count = count + 1
 		end
 
 		local toReturn = strategies.keyNode(keys, nil, duplicated_next) --Replace current node.
 
 		--Having a second if here is inneficient, todo: take a look at fixing it.
-		if next ~= nil then
-			duplicated_next.updatePrev(duplicated_next) --Fix current node.
-		end
-
-		--If you're meant to mutate.
-		if do_mutation then
-			toReturn.mutate()
-			--Possible error here, we might be off by a couple.
+		if duplicated_next ~= nil then
+			duplicated_next.updatePrev(toReturn) --Fix current node.
 		end
 
 		--Give back the head (or if recursive the currently generated node).
-		return toReturn, count
+		return toReturn
 	end
 
 	function node.toString(i)
-		local toReturn = i..":"
+		local toReturn = i.."{"
 		for k,v in pairs(keys) do
 			toReturn = toReturn..k
 		end
+		toReturn = toReturn.."}"
 		if(next ~= nil) then toReturn = toReturn..", "..next.toString(i+1) end
 		return toReturn
 	end
@@ -131,8 +141,9 @@ end
 function strategies.iterate(strategy)
 	for i=1, strategies.count, 1 do
 		local _strategy = nil local _size = nil
-		_strategy, _size = strategy.duplicate(true)
-		strategies[i] = {score=0, chancesLeft=strategies.baseChances, size=_size, cost=0, strategy=_strategy }
+		_strategy = strategy.duplicate()
+		strategies[i] = {score=0, chancesLeft=strategies.baseChances, cost=0, strategy=_strategy }
+		_strategy.mutate()
 	end
 
 	--Used to figure out where we are in the strategies.

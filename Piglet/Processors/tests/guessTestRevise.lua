@@ -17,11 +17,14 @@ function guessTestRevise.iterate()
 		end
 	end
 
+	--Increase the cost calculation for that strategy.
+	strategy.cost = strategy.cost + 1
+
 	--If we've reached the end, iterate on the winning formula.
 	if(Piglet.Memory.Short.strategies.refresh == true) then
 
 		Piglet.Memory.Short.strategies.refresh = false --We're doing it.
-		
+
 		local bestStrategy = 1
 		local bestScore = 0
 		--Find winner
@@ -31,8 +34,20 @@ function guessTestRevise.iterate()
 				bestStrategy = i
 			end
 		end
+		--Let me know.
+		print("trial finished: "..bestScore.." - ["..Piglet.Memory.Short.strategies[bestStrategy].strategy.toString(0).."]")
+	
+		--If your best trial gave you a zero, then you might be stuck, and I think it's time to reset.
+		if(bestScore/Piglet.Memory.Short.strategies[bestStrategy].cost <= 3) then
+			print("bored, resetting")
+			Piglet.Memory.Short.forgetSeen()
+			Piglet.Memory.Short.resetInitialState()
+		else
+			print("still interested: "..Piglet.Memory.Short.strategies[bestStrategy].cost)
+		end
+
+		--And iterate.
 		Piglet.Memory.Short.strategies.iterate(Piglet.Memory.Short.strategies[bestStrategy].strategy)
-		print("trial finished: "..bestScore..", "..Piglet.Memory.Short.strategies.currentNode.toString(0))
 	end
 end
 

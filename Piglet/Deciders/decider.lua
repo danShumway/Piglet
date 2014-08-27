@@ -24,6 +24,7 @@ function decider.pickKeys()
 		if(memory[memory.currentIndex].chancesLeft > 0) then
 			--Reduce chances for current index.
 			memory[memory.currentIndex].chancesLeft = memory[memory.currentIndex].chancesLeft - 1
+			memory[memory.currentIndex].cost = 0
 			--Retry.
 			memory.currentNode = memory[memory.currentIndex].strategy
 		else

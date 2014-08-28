@@ -1,21 +1,33 @@
 local processor = {}
 
 
-local test = dofile("Processors/tests/changerTest.lua")
+local test = dofile("Processors/tests/guessTestRevise.lua")--dofile("Processors/tests/changerTest.lua")
 
 --Do some processing on the info.
 function processor.process()
+
 	--We'll potentially deal with this differently in the future.
+	--[[
 	Piglet.Memory.Short.forgetStates()
 
 	test.reverse()
 	Piglet.Memory.Long.save("Mario_6Golden_Coins", "test_01", Piglet.Memory.Short.allCauses())
+
+	]]
 	--processor.pickGoal()
 
 	--print(Piglet.Memory.Short.currentGoal.address)
 	--print(Piglet.Memory.Short.currentGoa)
+	test.iterate()
 
 end
+
+
+
+---------------------------------------------------------------------------
+--Not used at this state, this is for updating goals based on the whole
+--causation model, which I'm not going to be using soon.
+---------------------------------------------------------------------------
 
 function processor.pickGoal()
 

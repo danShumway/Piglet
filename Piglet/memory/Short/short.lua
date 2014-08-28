@@ -9,6 +9,78 @@ short.currentGoal.address = 0
 short.currentGoal.rating = 0
 short.currentGoal.goal = "mem_0"
 
+------------------------------------------------------------------------------------------------------
+---------------------------RESETS---------------------------------------------------------------------
+--
+--
+------------------------------------------------------------------------------------------------------
+
+
+local initialState = savestate.create()
+
+function short.recordInitialState()
+	savestate.save(initialState)
+end
+
+function short.resetInitialState()
+	savestate.load(initialState)
+end
+
+------------------------------------------------------------------------------------------------------
+--End data structure for resets.
+------------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------------
+-------------------------SIGNIFICANT CHANGES----------------------------------------------------------
+--Keeps track of all of the states that have been seen, and the number of times they have been seen.
+--
+------------------------------------------------------------------------------------------------------
+
+local seen = {}
+
+
+short.strategies = dofile("Memory/Short/DataStructures/strategy.lua")
+
+--Returns the number of times I've seen this state.
+function short.haveSeen(state, value)
+	--If I've seen this state change.
+	if(seen[state]) then
+		if(seen[state][value]) then
+			return seen[state][value]
+		end
+	end
+
+	return 0
+end
+
+function short.forgetSeen()
+	seen = {}
+end
+
+--Adds a new state to the list of things you've seen.
+--Also returns the number of time's I've seen this state.
+function short.updateSeen(state, value)
+	--Set up state if it doesn't yet exist.
+	if(seen[state] == nil) then
+		seen[state] = {}
+	end
+	--Set up seen state if it doesn't exist yet.
+	if(seen[state][value] == nil) then
+		seen[state][value] = 1 --I've seen it once.
+		return 0
+	else
+		seen[state][value] = seen[state][value] + 1 --I've seen it again.
+		return seen[state][value] - 1
+	end
+end
+
+
+
+
+-------------------------------------------------------------------------------------------------------
+--------------------------CAUSE AND EFFECT-------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
+
 --Send a state/result to the causes array.  Effect isn't really talked about here.
 function short.updateCause(state, cause, direction)
 	--If we don't have existing data for the state.
@@ -27,7 +99,7 @@ function short.updateCause(state, cause, direction)
 
 		--Start it at the proper chance.
 		causes[state][cause].chance = direction
-	else
+	else 
 		--We keep things simple for right now.
 		--Just update it.  Don't worry about bayesian stuff.
 

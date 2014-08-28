@@ -3,6 +3,7 @@ local decider = {}
 
 function decider.pickKeys()
 	--vba.print(Piglet.Memory.Short.currentGoal.goal)
+	--[[
 	local keys = {}
 	local available = Piglet.Hardware.Hand.getAvailableKeys()
 
@@ -12,14 +13,45 @@ function decider.pickKeys()
 			keys[v] = 1
 		end
 	end
+	]]
+
+	--Get the keys for this current test.
+	local memory = Piglet.Memory.Short.strategies
+	local currentStep = memory.currentNode.getKeys()
+	--If we'ver reached the end of this sequence.
+	if(currentStep.nextNode == nil) then
+		--If we still have chances left.
+		if(memory[memory.currentIndex].chancesLeft > 0) then
+			--Reduce chances for current index.
+			memory[memory.currentIndex].chancesLeft = memory[memory.currentIndex].chancesLeft - 1
+			memory[memory.currentIndex].cost = 0
+			--Retry.
+			memory.currentNode = memory[memory.currentIndex].strategy
+		else
+			--Increment current index.
+			memory.currentIndex = memory.currentIndex + 1
+
+			if(Piglet.Memory.Short.strategies.currentIndex > Piglet.Memory.Short.strategies.count) then
+				Piglet.Memory.Short.strategies.refresh = true
+				memory.currentIndex = 1
+				--Piglet.Memory.Short.strategies.currentIndex = 1 --Loop.
+				--We've looped, which means this is a full trial.
+				--Piglet.Memory.Short.strategies.chancesLeft = Piglet.Memory.Short.strategies.chancesLeft - 1
+				--Oh yeah, we need a new node for next turn.
+				--Piglet.Memory.Short.strategies.currentNode = Piglet.Memory.Short.strategies[1].strategy
+			end
+		end
+	else
+		memory.currentNode = currentStep.nextNode
+	end
 
 	--Decide which keys to press.
-	local checked = {} 
-	checked[Piglet.Memory.Short.currentGoal.goal] = 1
+	--local checked = {} 
+	--checked[Piglet.Memory.Short.currentGoal.goal] = 1
 	--if(input.get().tab == true) then
 		--decider.maximizeGoal(Piglet.Memory.Short.currentGoal.goal, 1, keys, checked, 1)
 	--end
-	Piglet.Hardware.Hand.setKeys(keys)
+	Piglet.Hardware.Hand.setKeys(currentStep.toPress)
 end
 
 

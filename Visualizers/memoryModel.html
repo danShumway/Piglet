@@ -16,6 +16,8 @@
 		 	var toDraw = {
 		 		"key_left" : {"color": "#00ff00", "active":true},
 		 		"key_right" : {"color": "#00ff00", "active":true},
+		 		"key_up" : {"color": "#00ff00", "active":true},
+		 		"key_down" : {"color": "#00ff00", "active":true},
 		 		"default" : {"color": "#fff000", "active":true},
 		 		"key_A" : {"color": "#0001ff", "active":true},
 		 		"key_B" : {"color": "#0001ff", "active":true}
@@ -125,6 +127,10 @@
 				 				ctx.fillRect((i-posX)*scale, 400, scale, 100*total[i][c].chance);
 				 			}
 			 			}*/
+			 			ctx.fillStyle = "#000000";
+			 			ctx.fillRect(0, 400, 1920, 1);
+			 			ctx.fillRect(0, 700, 1920, 1);
+			 			ctx.fillRect(0, 100, 1920, 1);
 			 			for(var c in toDraw) {
 			 				if(document.getElementById(c).checked){
 				 				ctx.fillStyle = toDraw[c].color;

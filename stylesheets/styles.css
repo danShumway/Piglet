@@ -686,6 +686,14 @@ header p {
   margin: 0px;
 }
 
+#piglet {
+  position:fixed;
+  bottom:25px;
+  left:50%;
+  margin-left:275px;
+  width:240px;
+}
+
 #banner {
   z-index: 100;
   left: 0;
@@ -907,6 +915,12 @@ footer {
     bottom: auto;
     width: auto;
   }
+
+  #piglet {
+    display: none;
+  }
+}
+@media print, screen and (max-width: 900px) {
 }
 @media print, screen and (max-width: 720px) {
   body {

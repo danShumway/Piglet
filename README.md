@@ -2,7 +2,7 @@
 
 ![alt tag](https://raw.githubusercontent.com/danShumway/Piglet/master/images/piglet_logo.png)
 
-A LUA driven AI that plays classic gameboy color games using experimentation.  In active development.
+A Lua driven AI that plays classic gameboy color games using experimentation.  In active development.
 
 
 

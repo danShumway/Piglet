@@ -1,0 +1,38 @@
+
+To change something you must first describe it.  To describe something, you must first see it.  Hold still in one place for as long as it takes to see something.
+- So you want to be a wizard, Diane Doane
+
+
+
+I have a dictionary of effects.  Each effect has a cause.
+
+Each cause (separated into a single thing, can be listed as an effect of something else.)
+
+
+What do I do when I'm learning though?  I can't just watch everything at once....
+
+You only watch one thing (or maybe two), then you store your results above.  Including how certain you are of something.
+
+You have ther requirements for the state.  So it's less about cause and effect and more about requirements.  x has to be true before y can be true.  And I could weight each requirement.  So you just try to fulfill as many requirements as you can.
+
+That way, I can also have states I avoid.
+
+If x requires y and z requires x, how do I avoid a z requires x system.  The short answer is that you don't, do you?  Sometimes, you would even want that.  But if you did want to avoid that, you could have it be:
+recursively avoid previous requirements.
+
+If x happens without y, y's weight goes down moderately.
+If x doesn't happen without y, y's weight goes up (?) moderately
+If x happens with y, y's weight goes up slightly.
+If y doesn't happen with y, y's weight goes down slightly.
+
+
+So, you can literally have a list of single string values.  Something to the effect of "n_mem_25483_by_3" or something like that.
+
+So some other tricks.  Say that it's going up by 1.  Is there a way to generalize that?  Wait, do you need to?
+
+
+If there's a slight chance that x might go up and cause y to happen....  You just have that chance.  Or would it get filtered out?  It might get filtered out.
+
+But that would happen regardless.  Let's go back even another step  You have something you want to happen.  If you do it, and it doesn't happen, that means something unexpected about what you were doing happened.  Ie, you want this to go up by 1.  But it doesn't.  It goes to 0.  Which means either (a-there's something you don't understand, or b, sometimes it isn't true, or c, both.)  So let's say you go with c.  The first thing you do is add that as an effect(?), and slightly reduce the causes to the previous.  X isn't alwasy going to go up...  How would you get the part you haven't learned yet though?  You would need to be able to reproduce it?  Or that would be what you start watching more likely.  So you have the same goal, but you start watching for what is happening *when* it happens.  But you don't add in the cuases you already know about?????
+
+Instead, what?  Something else happened, or something didn't happen.

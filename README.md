@@ -23,7 +23,7 @@ To be sure of the license, double check source files to see if they have the fol
 --
 ```
 
-The license included at the top of a file always trumps any other licenses that you see in this repo.
+The license included at the top of a file always trumps any other licenses that you see in this repo, but if you see something without a license, it's pretty safe to assume I mean it to be licensed under the GNU affero.
 
 #### Images and other Stuff
 

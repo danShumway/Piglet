@@ -1,7 +1,5 @@
 # Piglet
 
-![alt tag](https://raw.githubusercontent.com/danShumway/Piglet/master/images/piglet_logo.png)
-
 A Lua driven AI that plays classic gameboy color games using experimentation.  In active development.
 
 
@@ -39,3 +37,18 @@ Absolutely, provided you follow a couple of quick instructions:
 * **I'd love to see what you're doing:** While it's not by any means a requirement, if you make something cool with Piglet's code, please please show me.  I'd love to see it!
 
 The most important thing to do when forking Piglet is to respect the copyrights and trademarks, and, to the best of your ability, to make a conscious effort not to do something jerky with it.  If you think you can handle that, by all means go crazy.  I can not begin to say how awesome forking is - so do it and make some cool crazy stuff!
+
+Speaking of which...
+
+###Installation and Running
+=====================================================
+
+- Install [Visual Boy Advance](https://code.google.com/p/vba-rerecording/)
+    - I use an older version of Visual Boy Advance that was built with a Lua console.  From their website: "The primary function of this branch is to expand features related to the creation of Tool-assisted movies."  The great thing about using this is that all of the Lua stuff is very self-contained, so you don't even need to install Lua on your actual computer, much less do any configuration.
+
+- Get some ROMs.
+	- You're on your own mate.
+
+- Launch
+	- Under Tools->Scripting->New Lua Script window, you can launch a new console window.  Navigate to index.lua inside Piglet's base directory, then hit run.
+	- Piglet will savestate as soon as she starts and if she gets bored, she'll jump back to that point.

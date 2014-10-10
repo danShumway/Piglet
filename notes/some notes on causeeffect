@@ -1,0 +1,32 @@
+What does x cause?  - Loop through, see if anything consistently changes 
+What does x cause when it happens?
+What causes x?
+
+Whenever x happens, what else happens on the next frame?
+	When x happens, check the next frame.
+		What bytes change when x happens?
+
+As x is happening, what changes?
+
+
+What does x cause -> 
+	on start.
+		What bytes change when x begins?
+		Do they change to the same value every time?
+	on continued.
+		What bytes change as x persists?
+			(Do they change in a predictable pattern? - next)
+	on stop.
+		What bytes change when x stops?
+
+
+What causes y?
+	When y happens, what did the previous frame look like?
+	Are there any values that were the same?
+
+
+
+Start with that?
+Just watching you?
+
+Put it together into a cause->effect relationship.

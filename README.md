@@ -1,7 +1,8 @@
 # Piglet
 
-A Lua driven AI that plays classic gameboy color games using experimentation.  In active development.
+A LUA driven AI that plays classic gameboy color games using experimentation.  In active development.
 
+[Learn more on the main page](http://danshumway.github.io/Piglet/)
 
 
 ### Licenses and Forking

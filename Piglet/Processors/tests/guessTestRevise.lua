@@ -22,7 +22,7 @@ function guessTestRevise.iterate()
 		print("trial finished: "..bestScore.." - ["..Piglet.Memory.Short.strategies[bestStrategy].strategy.toString(0).."]")
 	
 		--If your best trial gave you a zero, then you might be stuck, and I think it's time to reset.
-		if(bestScore/Piglet.Memory.Short.strategies[bestStrategy].cost <= 7) then
+		if(bestScore/Piglet.Memory.Short.strategies[bestStrategy].cost <= 3) then
 			print("bored, resetting")
 			Piglet.Memory.Short.forgetSeen()
 			Piglet.Memory.Short.resetInitialState()

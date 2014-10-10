@@ -1,5 +1,9 @@
-local processor = {}
+--
+--Licensed under GNU affero general public license
+--http://www.gnu.org/licenses/agpl-3.0.html
+--
 
+local processor = {}
 
 local test = dofile("Processors/tests/guessTestRevise.lua")--dofile("Processors/tests/changerTest.lua")
 

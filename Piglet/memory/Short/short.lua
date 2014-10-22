@@ -13,6 +13,8 @@ short.currentGoal = {}
 short.currentGoal.address = 0
 short.currentGoal.rating = 0
 short.currentGoal.goal = "mem_0"
+short.interest = 2
+short.baseInterest = 2
 
 ------------------------------------------------------------------------------------------------------
 ---------------------------RESETS---------------------------------------------------------------------

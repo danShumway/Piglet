@@ -36,10 +36,6 @@ function observer.observe()
 		{40960, 49152} --A000-C000-System RAM
 	}
 
-	areasOfInterest = {
-		{0, 65536}
-	}
-
 	function loop(first, last)
 		for a=first, last do
 			if(Piglet.Memory.Instant.lastFrame[a] ~= Piglet.Memory.Instant.currentFrame[a]) then

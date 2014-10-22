@@ -38,15 +38,16 @@ and stores that in instant memory as well.
 --]]
 
 --ToDo: replace these with classes that wrap around the data structures.
+Piglet.Hardware = {}
+Piglet.Hardware.Eye = dofile('Hardware/eye.lua')
+Piglet.Hardware.Hand = dofile('Hardware/hand.lua')
+
+
 Piglet.Memory = {}
 Piglet.Memory.Instant = dofile('memory/Instant/instant.lua')
 Piglet.Memory.Short = dofile('memory/Short/short.lua')
 --We don't have an accessible long.  What long should be is a class that pulls data and puts it into short.
 Piglet.Memory.Long = dofile('memory/Long/long.lua')
-
-Piglet.Hardware = {}
-Piglet.Hardware.Eye = dofile('Hardware/eye.lua')
-Piglet.Hardware.Hand = dofile('Hardware/hand.lua')
 
 
 --[[
@@ -102,9 +103,9 @@ end
 function draw()
 
 	local toPrint = ' '
-	local keys = joypad.get(1)
+	local keys = Piglet.Hardware.Hand.getKeys()--joypad.get(1)
 	for key, value in pairs(keys) do
-		if(value == true) then
+		if value ~= nil then
 			toPrint = toPrint..key..' '
 		end
 	end

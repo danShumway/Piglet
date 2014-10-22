@@ -1,163 +1,139 @@
 --
+--Copyright Daniel Shumway
 --Licensed under GNU affero general public license
 --http://www.gnu.org/licenses/agpl-3.0.html
 --
 
-----------------------------------------------------------------------
---Data structure for strategies.
-----------------------------------------------------------------------
+---------------------------------------------------------------
+--Data strcture for strategies.
+---------------------------------------------------------------
+-- how it works:
+-- We have a set dictionary of nodes.  Each node has a way of getting a next
+-- That next returns an numerical index of a node (in the dictionary).
+-- When you call getKeys, it will return both the keys that should be pressed,
+-- and the node to call next time you're pressing a node
+---------------------------------------------------------------
 local strategies = {}
 
---Generates a new node for use in a strategy
---Add what keys you want pressed, and the nodes that you want to be inserted in.
-function strategies.keyNode(step_keys, node_prev, node_next)
-	local node = {}
-	local keys = step_keys
+function strategies.init(node_count)
+	strategies.curStrategy = {strategy=strategies.strategy(10), score=0}
+	strategies.prevStrategy = {strategy=strategies.strategy(10), score=0}
+	strategies.refresh = false
+	strategies.currentNode = strategies.curStrategy.strategy.nodes[1]
+end
 
-	--For attaching and internal use.
-	local prev = node_prev
-	local next = node_next
-	--Updating position.
-	function node.updateNext(new_node)
-		next = new_node
-	end
-	function node.updatePrev(new_node)
-		prev = new_node
+function strategies.getNode(number)
+	return strategies.curStrategy.strategy.nodes[number]
+end
+
+function strategies.strategy(node_count)
+	local strategy = {count=node_count}
+	strategy.nodes = {}
+
+	--Create the nodes
+	for i=1, strategy.count do
+
+		--Make a random selection of keys
+		local random_keys = {}
+		local available = Piglet.Hardware.Hand.getAvailableKeys()
+		for k, v in pairs(available) do
+			if math.random() < .2 then
+				random_keys[v] = 1
+			end
+		end
+
+		--Build node.
+		strategy.nodes[i] = strategies.keyNode(random_keys, math.floor(math.random()*strategy.count)+1 )
 	end
 
-	--Returns both the keys that you're supposed to press
-	--And a link to the next node to check (or nil if you're at the end of the )
+	return strategy
+end
+
+function strategies.trace(strategy)
+	toPrint = " "
+
+	local c = 1
+	for i=1, strategy.strategy.count do
+		toPrint = toPrint.."{"
+		for k,v in pairs(strategy.strategy.nodes[c].getKeys().toPress) do
+			toPrint = toPrint.." "..k
+		end
+
+		if(strategy.strategy.nodes[c].getKeys().nextNode == nil) then
+			toPrint = toPrint..":nil}"
+			c = 1
+		else
+			toPrint = toPrint..":"..strategy.strategy.nodes[c].getKeys().nextNode.."}"
+			c = strategy.strategy.nodes[c].getKeys().nextNode
+		end
+	end
+
+	return toPrint
+end
+
+--Returns a completely new strategy based off of the old one passed in.
+function strategies.iterate(base_strategy)
+
+	--Duplicate all the existing nodes.
+	local toReturn = {count=base_strategy.count}
+	toReturn.nodes = {}
+
+	for i=1, toReturn.count do
+		toReturn.nodes[i] = strategies.keyNode({}, nil)
+		toReturn.nodes[i].loadData(base_strategy.nodes[i].getData())
+	end
+
+
+	--Pick a random node.
+	local randomNode = math.floor(math.random()*toReturn.count)+1
+
+	--Make a random selection of keys
+	local random_keys = {}
+	local available = Piglet.Hardware.Hand.getAvailableKeys()
+	for k, v in pairs(available) do
+		if math.random() < .2 then
+			random_keys[v] = 1
+		end
+	end
+
+	--Build the node and replace the old one.
+	toReturn.nodes[randomNode] = strategies.keyNode(random_keys, math.floor(math.random()*toReturn.count)+1)
+	--Return new data structure.
+	return {strategy=toReturn, score=0}
+end
+
+--Allows Piglet to press keys.
+function strategies.keyNode(step_keys, node_next)
+	local node = {type="keyNode"}
+
 	function node.getKeys()
-		return {toPress=keys, nextNode=next}
+		return {toPress=step_keys, nextNode=node_next}
 	end
 
-	function node.delete()
-		if prev ~= nil then
-			prev.updateNext(next)
-		end
-		if next ~= nil then
-			next.updatePrev(prev)
-		end
+	--Saving and loading.
+	function node.getData()
+		return {toPress=step_keys, nextNode=node_next, type="keyNode"}
 	end
 
-	--Handle mutation.
-	--Recursively via first node.
-	function node.mutate()
-
-		if math.random() < .05 then
-			--Get some random keys.
-			local random_keys = {}
-			local available = Piglet.Hardware.Hand.getAvailableKeys()
-			for k, v in pairs(available) do
-				if math.random() < .2 then
-					random_keys[v] = 1
-				end
-			end
-
-			--Choose where to attach them.
-			local r = math.random(1, 6)
-
-
-
-			if r == 1 then --Adjust current node.
-				keys = random_keys
-
-			elseif r == 2 then --Insert a previous node.
-				local new_node = strategies.keyNode(random_keys, prev, node)
-				if prev ~= nil then prev.updateNext(new_node) end
-				prev = new_node
-
-			elseif r == 3 then --Insert a next node.
-				local new_node = strategies.keyNode(random_keys, node, next)
-				if next ~= nil then next.updatePrev(new_node) end
-				next = new_node
-
-			elseif r == 4 then --Delete a previous node.
-				if prev ~= nil then 
-					prev.delete()
-				end
-
-			elseif r == 5 then --Delete next node.
-				if(next ~= nil) then
-					next.delete()
-				end
-			end
-		end
-
-
-		--Move on to the next node.
-		if(next ~= nil) then
-			next.mutate()
-		end
-	end
-
-	--Returns a new strategy, optionally do mutations as well.
-	function node.duplicate()
-		--If you're not at the end of the sequence.
-		local duplicated_next = nil
-		local count = 1
-		if next ~= nil then
-			duplicated_next = next.duplicate(do_mutation)
-		end
-
-		local toReturn = strategies.keyNode(keys, nil, duplicated_next) --Replace current node.
-
-		--Having a second if here is inneficient, todo: take a look at fixing it.
-		if duplicated_next ~= nil then
-			duplicated_next.updatePrev(toReturn) --Fix current node.
-		end
-
-		--Give back the head (or if recursive the currently generated node).
-		return toReturn
-	end
-
-	function node.toString(i)
-		local toReturn = i.."{"
-		for k,v in pairs(keys) do
-			toReturn = toReturn..k
-		end
-		toReturn = toReturn.."}"
-		if(next ~= nil) then toReturn = toReturn..", "..next.toString(i+1) end
-		return toReturn
+	function node.loadData(node_data)
+		step_keys = node_data.toPress
+		node_next = node_data.nextNode
+		node.type="keyNode"
 	end
 
 	return node
 end
 
---Not filled out right now, but will be.
-function strategies.choiceNode()
+--Allows Piglet to execute some basic logic.
+--mem_address (number), the address for the if statement.
+--comparison (number 0-255), the value to run comparison on
+--true_next (number), what node to go to if 
+function strategies.choiceNode(mem_address, comparison, true_next, false_next)
+	local node = {type="choiceNode"}
 
+	return node
 end
 
---Length: how many strategies.  **Must** be at least 1.
-function strategies.init(length, chances)
-	strategies.count = length --
-	strategies.baseChances = chances
-	for i=1, length, 1 do
-		strategies[i] = {score=0, chancesLeft=strategies.baseChances, size=1, cost=0, strategy=strategies.keyNode({}, nil, nil) }
-	end
-
-
-	--Used to figure out where we are in the strategies.
-	strategies.currentIndex = 1
-	strategies.currentNode = strategies[1].strategy
-end
-
-function strategies.iterate(strategy)
-	for i=1, strategies.count, 1 do
-		local _strategy = nil local _size = nil
-		_strategy = strategy.duplicate()
-		strategies[i] = {score=0, chancesLeft=strategies.baseChances, cost=0, strategy=_strategy }
-		_strategy.mutate()
-	end
-
-	--Used to figure out where we are in the strategies.
-	strategies.currentIndex = 1
-	strategies.currentNode = strategies[1].strategy
-end
-
-----------------------------------------------------------------------
---end data structure for strategies.
-----------------------------------------------------------------------
-
+--Send stuff back out.
+strategies.init()
 return strategies

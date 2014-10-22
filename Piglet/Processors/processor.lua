@@ -5,7 +5,7 @@
 
 local processor = {}
 
-local test = dofile("Processors/tests/guessTestRevise.lua")--dofile("Processors/tests/changerTest.lua")
+local test = dofile("Processors/tests/smarterGuessTestRevise.lua")--dofile("Processors/tests/changerTest.lua")
 
 --Do some processing on the info.
 function processor.process()

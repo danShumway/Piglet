@@ -18,7 +18,8 @@ nil means not pressed, 1 means pressed.
 local currentlyHolding = {}
 
 --Sets which keys the hand will hold down next frame.
-function hand.setKeys(keys) 
+function hand.setKeys(keys)
+	if keys == nil then keys = {} end
 	currentlyHolding = keys
 	--Also update the vba emulator.
 	joypad.set(1, keys)
